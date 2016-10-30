@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <channel>
+        <title>ryanclark.me</title>
+        <description>Blog about all things technical</description>
+        <link>http://ryanclark.me</link>
+        <atom:link href="http://ryanclark.me/feed.xml" rel="self" type="application/rss+xml" />
+        
+        <item>
+            <title>Going native with React, an introduction</title>
+            
+            
+            <description>&lt;p&gt;As a JavaScript developer, I would’ve never thought that I could make &lt;strong&gt;native&lt;/strong&gt; mobile applications easily in JavaScript. Sure, we have tools such as PhoneGap, but wrapping our browser based application in native application leaves a lot to be desired&lt;/p&gt;
+
+</description>
+            
+            <pubDate>Mon, 11 May 2015 10:00:00 +0100</pubDate>
+            <link>http://ryanclark.me/going-native-with-react</link>
+            <guid isPermaLink="true">http://ryanclark.me/going-native-with-react</guid>
+        </item>
+        
+        <item>
+            <title>RGB to Hex via Binary Shifting</title>
+            
+            
+            <description>&lt;p&gt;A colleague of mine presented me with this code, baffled as to how it works&lt;/p&gt;
+
+</description>
+            
+            <pubDate>Thu, 16 Apr 2015 10:00:00 +0100</pubDate>
+            <link>http://ryanclark.me/rgb-to-hex-via-binary-shifting</link>
+            <guid isPermaLink="true">http://ryanclark.me/rgb-to-hex-via-binary-shifting</guid>
+        </item>
+        
+        <item>
+            <title>Introduction to Facebook&#39;s Flux architecture</title>
+            
+            
+            <description>&lt;p&gt;If you’re like me and you wanted to go further with React, you more than likely would’ve checked out &lt;a href=&quot;http://facebook.github.io/flux/docs/overview.html#content&quot; target=&quot;_blank&quot;&gt;Flux&lt;/a&gt;, had a glance, closed the tab and then reassessed your life as a Javascript developer&lt;/p&gt;
+
+</description>
+            
+            <pubDate>Sat, 21 Feb 2015 09:00:00 +0000</pubDate>
+            <link>http://ryanclark.me/getting-started-with-flux</link>
+            <guid isPermaLink="true">http://ryanclark.me/getting-started-with-flux</guid>
+        </item>
+        
+        <item>
+            <title>Getting started with React</title>
+            
+            
+            <description>&lt;p&gt;React is an insanely powerful framework by the amazing developers over at Facebook. Implementing a virtual DOM, it allows us to render components super fast whilst removing any unnecessary overhead from DOM operations. React is often said to deal with the “V” out of the MVC architecture, however when you mix this with Flux, you can have a full blown front-end framework that allows you to easily keep your model and view in sync&lt;/p&gt;
+
+</description>
+            
+            <pubDate>Tue, 17 Feb 2015 09:00:00 +0000</pubDate>
+            <link>http://ryanclark.me/getting-started-with-react</link>
+            <guid isPermaLink="true">http://ryanclark.me/getting-started-with-react</guid>
+        </item>
+        
+        <item>
+            <title>How AngularJS implements dirty checking and how to replicate it ourselves</title>
+            
+            
+            <description>&lt;p&gt;AngularJS implements dirty checking for two way data binding on $scope variables. Unlike dynamically setting up setters and getters, which is how Ember.js does two way data binding, dirty checking allows Angular to watch for variables that may or may not exist&lt;/p&gt;
+
+</description>
+            
+            <pubDate>Mon, 14 Jul 2014 15:10:32 +0100</pubDate>
+            <link>http://ryanclark.me/how-angularjs-implements-dirty-checking</link>
+            <guid isPermaLink="true">http://ryanclark.me/how-angularjs-implements-dirty-checking</guid>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>How AngularJS implements dirty checking and how to replicate it ourselves</title>
+
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,600,700">
+
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
+<link href="/css/main.2ab3f8961b31d8f18dcf1491ae95766a.css" rel="stylesheet"></head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar__fixed">
+    <div class="sidebar__info">
+      
+      <a href="/" class="logo">
+        <canvas width="72px" height="72px"></canvas>
+      </a>
+      
+
+      <div class="sidebar__overlay ">
+        <span class="sidebar__title">ryanclark.me</span>
+
+        <ul class="social">
+          <li class="social__item">
+            <a target="_blank" href="https://twitter.com/rynclark">
+              <i class="fa fa-fw fa-twitter"></i>
+            </a>
+          </li>
+          <li class="social__item">
+            <a target="_blank" href="/feed.xml">
+              <i class="fa fa-fw fa-rss"></i>
+            </a>
+          </li>
+          <li class="social__item">
+            <a target="_blank" href="http://github.com/rynclark">
+              <i class="fa fa-fw fa-github"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <nav class="navigation">
+      <ul class="navigation__list">
+        <li class="navigation__item">
+          <h3 class="navigation__header">Deep Dive Series</h3>
+        </li>
+        <li class="navigation__item">
+          <a href="/" class="navigation__link">
+            Webpack
+          </a>
+        </li>
+      </ul>
+      <ul class="navigation__list">
+        <li class="navigation__item">
+          <h3 class="navigation__header">React</h3>
+        </li>
+        <li class="navigation__item">
+          <a href="/going-native-with-react/" class="navigation__link">
+            Go native with React
+          </a>
+        </li>
+        <li class="navigation__item">
+          <a href="/getting-started-with-flux/" class="navigation__link">
+            Introduction to Flux
+          </a>
+        </li>
+        <li class="navigation__item">
+          <a href="/getting-started-with-react/" class="navigation__link">
+            Getting started with React
+          </a>
+        </li>
+      </ul>
+      <ul class="navigation__list">
+        <li class="navigation__item">
+          <h3 class="navigation__header">Angular</h3>
+        </li>
+        <li class="navigation__item">
+          <h4 class="navigation__sub-header">1.x</h4>
+        </li>
+        <li class="navigation__item">
+          <a href="/how-angularjs-implements-dirty-checking/" class="navigation__link">
+            How Angular dirty checks
+          </a>
+        </li>
+      </ul>
+      <ul class="navigation__list">
+        <li class="navigation__item">
+          <h3 class="navigation__header">Misc</h3>
+        </li>
+        <li class="navigation__item">
+          <a href="/rgb-to-hex-via-binary-shifting/" class="navigation__link">
+            RGB to hex via binary shifting
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="sidebar__progress">
+      <div class="sidebar__progress__bar"></div>
+    </div>
+  </div>
+</aside>
+
+
+<section class="content">
+  <div class="container">
+    <article class="article">
+	<header>
+		<h2>How AngularJS implements dirty checking and how to replicate it ourselves</h2>
+		<span class="time">14 Jul 2014</span>
+	</header>
+
+  <div class="post contents">
+
+    <div class="warning">
+      <i class="fa fa-exclamation-circle"></i>
+
+      Angular constantly update the digest function so this won't match the source, but the general idea is still the same
+    </div>
+
+
+    <div class="product-versions">
+
+<div class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span>
+  <span class="err">//</span> <span class="err">Versions</span>
+  <span class="nt">&quot;angular&quot;</span><span class="p">:</span> <span class="s2">&quot;1.2.20&quot;</span>
+<span class="p">}</span></code></pre></div>
+
+    </div>
+
+
+	  <p>AngularJS implements dirty checking for two way data binding on $scope variables. Unlike dynamically setting up setters and getters, which is how Ember.js does two way data binding, dirty checking allows Angular to watch for variables that may or may not exist<!--more-->.</p>
+
+<h3 id="scopewatch">$scope.$watch</h3>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span> <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span><span class="p">,</span> <span class="nx">objectEquality</span> <span class="p">);</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>To watch when a variable changes, you will use the <code>$scope.$watch</code> function. With this you give three arguments, what to watch (<code>watchExp</code>), what to do when it’s updated (<code>listener</code>), and whether or not you’re checking on a variable or on an object. As we are checking a variable, we can ommit this when we call the function. For example -</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1
+2
+3
+4
+5
+6
+7</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Ryan&#39;</span><span class="p">;</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;$scope.name was updated!&#39;</span><span class="p">);</span>
+<span class="p">}</span> <span class="p">);</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Angular will register your watcher function in the $scope. You can see that these are registered by logging the <code>$scope</code> to the console. <a href="http://jsfiddle.net/ryanclark/SraRB/2/" target="_blank">I’ve created a test directive on jsFiddle to demonstrate this.</a></p>
+
+<p>You’ll notice that the console logs the fact that <code>$scope.name</code> is updated - this is because <code>$scope.name</code> was previously undefined and we’ve updated it to equal <code>Ryan</code>!</p>
+
+<p>You can also use a string instead of a function in $watch. This will do exactly the same as providing a function. In the Angular source code, if you provide a string, the following code is ran - </p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1
+2
+3
+4
+5
+6
+7</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">watchExp</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">get</span><span class="p">.</span><span class="nx">constant</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">originalFn</span> <span class="o">=</span> <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span><span class="p">;</span>
+  <span class="nx">watcher</span><span class="p">.</span><span class="nx">fn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">newVal</span><span class="p">,</span> <span class="nx">oldVal</span><span class="p">,</span> <span class="nx">scope</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">originalFn</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">newVal</span><span class="p">,</span> <span class="nx">oldVal</span><span class="p">,</span> <span class="nx">scope</span><span class="p">);</span>
+    <span class="nx">arrayRemove</span><span class="p">(</span><span class="nx">array</span><span class="p">,</span> <span class="nx">watcher</span><span class="p">);</span>
+  <span class="p">};</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>This will set our watchExp to a function, in which it will call our listener with the variable that you’ve given the name of.</p>
+
+<h3 id="watchers">$$watchers</h3>
+
+<p>The <code>$$watchers</code> variable in <code>$scope</code> holds all of the watchers that you define. If you look into <code>$$watchers</code> in the jsFiddle, you’ll see that is an array of objects.</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1
+2
+3
+4
+5
+6
+7
+8
+9</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[</span>
+	<span class="p">{</span>
+		<span class="nx">eq</span><span class="o">:</span> <span class="kc">false</span><span class="p">,</span> <span class="c1">// whether or not we are checking for objectEquality</span>
+		<span class="nx">fn</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span> <span class="p">)</span> <span class="p">{},</span> <span class="c1">// this is the listener function we&#39;ve provided</span>
+		<span class="nx">last</span><span class="o">:</span> <span class="s1">&#39;Ryan&#39;</span><span class="p">,</span> <span class="c1">// the last known value for the variable</span>
+		<span class="nx">exp</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){},</span> <span class="c1">// this is the watchExp function we provided</span>
+		<span class="nx">get</span><span class="o">:</span> <span class="kd">function</span><span class="p">(){}</span> <span class="c1">// Angular&#39;s compiled watchExp function</span>
+	<span class="p">}</span>
+<span class="p">];</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>The <code>$watch</code> function returns the <code>deregisterWatch</code> function. This means that if we were to assign the initial <code>$scope.$watch</code> to a variable, we could just call it to stop watching. <a href="http://jsfiddle.net/ryanclark/SraRB/4/" target="_blank">View this in jsFiddle.</a> Make sure you open and look at the first <code>$scope</code> that is logged before clicking on remove watcher!</p>
+
+<p>However, <a href="http://jsfiddle.net/ryanclark/SraRB/5/" target="_blank">take a look at this.</a> If we were to remove the watcher before the controller function is evaluated, there is no log that we updated the <code>$scope.name</code> variable, even though we have - why is this?</p>
+
+<h3 id="scopeapply">$scope.$apply</h3>
+
+<p>Whenever a controller/directive/etc is ran in Angular, internally Angular runs a function called <code>$scope.$apply</code>. The <code>$apply</code> function will run a function given to it, before finally running the <code>$digest</code> function in the rootScope. More on digests later.</p>
+
+<p>The Angular $apply function looks like this -</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">$apply</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">expr</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">try</span> <span class="p">{</span>
+	  <span class="nx">beginPhase</span><span class="p">(</span><span class="s1">&#39;$apply&#39;</span><span class="p">);</span>
+	  <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">$eval</span><span class="p">(</span><span class="nx">expr</span><span class="p">);</span>
+	<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+	  <span class="nx">$exceptionHandler</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+	<span class="p">}</span> <span class="k">finally</span> <span class="p">{</span>
+	  <span class="nx">clearPhase</span><span class="p">();</span>
+	  <span class="k">try</span> <span class="p">{</span>
+	    <span class="nx">$rootScope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+	  <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+	    <span class="nx">$exceptionHandler</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+	    <span class="k">throw</span> <span class="nx">e</span><span class="p">;</span>
+	  <span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<h4 id="expr">expr</h4>
+
+<p>The <code>expr</code> argument is just a function that you or Angular would pass through when calling <code>$scope.$apply</code> - most of the time you won’t even need to use <code>$apply</code>, let alone give it a function!</p>
+
+<p>Let’s look into how <code>ng-keydown</code> uses <code>$scope.$apply</code>. To register the directive, Angular uses the following code -</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">ngEventDirectives</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">forEach</span><span class="p">(</span>
+  <span class="s1">&#39;click dblclick mousedown mouseup mouseover mouseout mousemove mouseenter mouseleave keydown keyup keypress submit focus blur copy cut paste&#39;</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">),</span>
+  <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">directiveName</span> <span class="o">=</span> <span class="nx">directiveNormalize</span><span class="p">(</span><span class="s1">&#39;ng-&#39;</span> <span class="o">+</span> <span class="nx">name</span><span class="p">);</span>
+    <span class="nx">ngEventDirectives</span><span class="p">[</span><span class="nx">directiveName</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;$parse&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$parse</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">{</span>
+        <span class="nx">compile</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$element</span><span class="p">,</span> <span class="nx">attr</span><span class="p">)</span> <span class="p">{</span>
+          <span class="kd">var</span> <span class="nx">fn</span> <span class="o">=</span> <span class="nx">$parse</span><span class="p">(</span><span class="nx">attr</span><span class="p">[</span><span class="nx">directiveName</span><span class="p">]);</span>
+          <span class="k">return</span> <span class="kd">function</span> <span class="nx">ngEventHandler</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="nx">element</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">element</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="nx">lowercase</span><span class="p">(</span><span class="nx">name</span><span class="p">),</span> <span class="kd">function</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
+              <span class="nx">scope</span><span class="p">.</span><span class="nx">$apply</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+                <span class="nx">fn</span><span class="p">(</span><span class="nx">scope</span><span class="p">,</span> <span class="p">{</span><span class="nx">$event</span><span class="o">:</span><span class="nx">event</span><span class="p">});</span>
+              <span class="p">});</span>
+            <span class="p">});</span>
+          <span class="p">};</span>
+        <span class="p">}</span>
+      <span class="p">};</span>
+    <span class="p">}];</span>
+  <span class="p">}</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>What this does is loop through the different types of events that can be fired and create a new directive called ng(EventNameHere). In the compile function of the directive, it registers an event handler on the element, with the event being the directives name respectively. When that event is fired, Angular runs <code>scope.$apply</code>, giving it a function to run as well. </p>
+
+<h3 id="this-is-only-one-way-data-binding">This is only one way data binding?</h3>
+
+<p>This will update the $scope value with the elements value - this is only one way data binding. This is because we’ve called <code>ng-keydown</code>, only alerting us when the keydown event is fired, and giving us the new value!</p>
+
+<h3 id="but-we-want-two-way-data-binding">But we want two way data binding!</h3>
+
+<p>Let’s take a look at <code>ng-model</code>. When you use <code>ng-model</code>, this allows you to do two way data binding - exactly what we want. <code>ng-model</code> uses both <code>$scope.$watch</code> (view to model) and <code>$scope.$apply</code> (model to view) to offer this.</p>
+
+<p><code>ng-model</code> will attach the event handler directive (such as <code>keydown</code>) to the input you’ve applied it to - this is where <code>$scope.$apply</code> is called! <code>$scope.$watch</code> is called in the directive’s controller. You can see this here -</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="kd">function</span> <span class="nx">ngModelWatch</span><span class="p">()</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">ngModelGet</span><span class="p">(</span><span class="nx">$scope</span><span class="p">);</span>
+
+	<span class="c1">// if scope model value and ngModel value are out of sync</span>
+	<span class="k">if</span> <span class="p">(</span><span class="nx">ctrl</span><span class="p">.</span><span class="nx">$modelValue</span> <span class="o">!==</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+
+		<span class="kd">var</span> <span class="nx">formatters</span> <span class="o">=</span> <span class="nx">ctrl</span><span class="p">.</span><span class="nx">$formatters</span><span class="p">,</span>
+			<span class="nx">idx</span> <span class="o">=</span> <span class="nx">formatters</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span>
+
+		<span class="nx">ctrl</span><span class="p">.</span><span class="nx">$modelValue</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+		<span class="k">while</span><span class="p">(</span><span class="nx">idx</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">value</span> <span class="o">=</span> <span class="nx">formatters</span><span class="p">[</span><span class="nx">idx</span><span class="p">](</span><span class="nx">value</span><span class="p">);</span>
+		<span class="p">}</span>
+
+		<span class="k">if</span> <span class="p">(</span><span class="nx">ctrl</span><span class="p">.</span><span class="nx">$viewValue</span> <span class="o">!==</span> <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+			<span class="nx">ctrl</span><span class="p">.</span><span class="nx">$viewValue</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    		<span class="nx">ctrl</span><span class="p">.</span><span class="nx">$render</span><span class="p">();</span>
+    	<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="nx">value</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>When you call <code>$scope.$watch</code> with only one argument, the function you provide it will be called regardless of what updates - perfect! The function that is given in <code>ng-model</code> checks if the model and view are out of sync, and if it is, it will update the model with its new value. The function returns the new value, so when it is ran in the <code>$digest</code> function, we will know what the new value is!</p>
+
+<h3 id="so-why-does-our-listener-not-fire">So why does our listener not fire?</h3>
+
+<p>If we look back at the jsFiddle where we deregister the <code>$scope.$watch</code> function in the same function as we define it, we can now understand why we don’t get notified about us updating <code>$scope.name</code> even though we did.</p>
+
+<p>As mentioned earlier, Angular runs <code>$scope.$apply</code> on every directive’s controller function. If we look into the <code>$scope.$apply</code> function, it only runs the <code>$digest</code> after the directive’s controller function has been evaluated - meaning that the <code>$scope.$watch</code> function never actually gets a chance to be called, as we’ve deregisted it before it could’ve been ran! But how is it ran? </p>
+
+<h3 id="digest">$digest</h3>
+
+<p>The <code>$digest</code> function is called on the <code>$rootScope</code> by <code>$scope.$apply</code>. This will run the digest cycle on the $rootScope and will then traverse down the scopes and run the digest cycle on that. In simple terms, the digest cycle will fire all of our <code>watchExp</code> functions in the <code>$$watchers</code> variable, compare them against the last known value, and if they’re different, fire the listener!</p>
+
+<p>When the digest cycle runs, it loops through the watchers and then loops again, whilst the cycle is considered “dirty”. The cycle is considered dirty when the <code>watchExp</code> and last known value aren’t equal to each other. Ideally this will run once, but if it runs more than 10 times you will get an error.</p>
+
+<p>So when <code>$scope.$apply</code> is ran, <code>$digest</code> is ran, it will then loop through the <code>$$watchers</code> and fire any listener event if the <code>watchExp</code> does not equal the last known value. <code>$scope.$apply</code> is ran by Angular on anything that could possibly contain a model value changing. This is why when you update the <code>$scope</code> outside of Angular, for instance in a <code>setTimeout</code> function, you need to run <code>$scope.$apply();</code> in order to have Angular notice that the scope has been updated!</p>
+
+<h3 id="lets-create-our-own">Let’s create our own</h3>
+
+<p>We’ll create a small, basic version of dirty checking that we can use. Angular’s dirty checking is a bit more advanced, offering async queues and some other neat things.</p>
+
+<h4 id="setup-our-scope">Setup our scope</h4>
+
+<p>Scope will just be a function, containing any data that we wish to store in it. We’ll extend the prototype object on the function to replicate <code>$digest</code> and <code>$watch</code>. We don’t need <code>$apply</code> as we’ll be won’t need to evaluate any functions in the context of the Scope - we’ll just simply use <code>$digest</code>. Our Scope will look like this - </p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">Scope</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	
+<span class="p">};</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Our <code>$watch</code> function needs to accept two parameters, <code>watchExp</code> and <code>listener</code>. When <code>$watch</code> is called, we’ll push these into the <code>$$watcher</code> value we’ve set in <code>Scope</code>.</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">Scope</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span>
+		<span class="nx">watchExp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+		<span class="nx">listener</span><span class="o">:</span> <span class="nx">listener</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+	<span class="p">}</span> <span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	
+<span class="p">};</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>You’ll notice that I’ve set <code>listener</code> to an empty function if there is no <code>listener</code> provided - this way we can register a <code>$watch</code> for all variables!</p>
+
+<p>Next we will work on the <code>$digest</code>. We need to check if the old value is equal to the new value, and fire the listener if it isn’t. We will then loop until they are equal to each other. This is where the <code>dirty</code> variable comes in - whether or not the values are equal to each other!</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">Scope</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span>
+		<span class="nx">watchExp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+		<span class="nx">listener</span><span class="o">:</span> <span class="nx">listener</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+	<span class="p">}</span> <span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
+
+	<span class="k">do</span> <span class="p">{</span>
+			<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+			<span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">watchExp</span><span class="p">(),</span>
+					<span class="nx">oldValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span><span class="p">;</span>
+
+				<span class="k">if</span><span class="p">(</span> <span class="nx">oldValue</span> <span class="o">!==</span> <span class="nx">newValue</span> <span class="p">)</span> <span class="p">{</span>
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">listener</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+
+					<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+	<span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Next, we need to create a new instance of our scope. We’ll assign this to <code>$scope</code>. We can then register a watch function, and <code>$digest</code> it after we update it!</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">Scope</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span>
+		<span class="nx">watchExp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+		<span class="nx">listener</span><span class="o">:</span> <span class="nx">listener</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+	<span class="p">}</span> <span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
+
+	<span class="k">do</span> <span class="p">{</span>
+			<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+			<span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">watchExp</span><span class="p">(),</span>
+					<span class="nx">oldValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span><span class="p">;</span>
+
+				<span class="k">if</span><span class="p">(</span> <span class="nx">oldValue</span> <span class="o">!==</span> <span class="nx">newValue</span> <span class="p">)</span> <span class="p">{</span>
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">listener</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+
+					<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+	<span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
+<span class="p">};</span>
+
+
+<span class="kd">var</span> <span class="nx">$scope</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">();</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Ryan&#39;</span><span class="p">;</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+<span class="p">}</span> <span class="p">);</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Success - we have dirty checking (in it’s most basic form) implemented! <a href="http://jsfiddle.net/ryanclark/PVQts/" target="_blank">Check out the jsFiddle</a> to mess around with what we’ve made. If you look at the console, you’ll notice it logs</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Ryan</span> <span class="kc">undefined</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Which is the exact behaviour we want - <code>$scope.name</code> was previously undefined and we’ve set it to Ryan - result!</p>
+
+<p>Let’s attach our <code>$digest</code> function to a <code>keyup</code> event on an input. That way we don’t have to call it ourselves. This means we can have two way data binding too!</p>
+
+<div class="code-block">
+
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">Scope</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span> <span class="o">=</span> <span class="p">[];</span>	
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$watch</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">watchExp</span><span class="p">,</span> <span class="nx">listener</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span> <span class="p">{</span>
+		<span class="nx">watchExp</span><span class="o">:</span> <span class="nx">watchExp</span><span class="p">,</span>
+		<span class="nx">listener</span><span class="o">:</span> <span class="nx">listener</span> <span class="o">||</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{}</span>
+	<span class="p">}</span> <span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nx">Scope</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">$digest</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">dirty</span><span class="p">;</span>
+
+	<span class="k">do</span> <span class="p">{</span>
+			<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">false</span><span class="p">;</span>
+
+			<span class="k">for</span><span class="p">(</span> <span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+				<span class="kd">var</span> <span class="nx">newValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">watchExp</span><span class="p">(),</span>
+					<span class="nx">oldValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span><span class="p">;</span>
+
+				<span class="k">if</span><span class="p">(</span> <span class="nx">oldValue</span> <span class="o">!==</span> <span class="nx">newValue</span> <span class="p">)</span> <span class="p">{</span>
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">listener</span><span class="p">(</span><span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span><span class="p">);</span>
+
+					<span class="nx">dirty</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+					<span class="k">this</span><span class="p">.</span><span class="nx">$$watchers</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">last</span> <span class="o">=</span> <span class="nx">newValue</span><span class="p">;</span>
+				<span class="p">}</span>
+			<span class="p">}</span>
+	<span class="p">}</span> <span class="k">while</span><span class="p">(</span><span class="nx">dirty</span><span class="p">);</span>
+<span class="p">};</span>
+
+
+<span class="kd">var</span> <span class="nx">$scope</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Scope</span><span class="p">();</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Ryan&#39;</span><span class="p">;</span>
+
+<span class="kd">var</span> <span class="nx">element</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">querySelectorAll</span><span class="p">(</span><span class="s1">&#39;input&#39;</span><span class="p">);</span>
+
+<span class="nx">element</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">onkeyup</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">element</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span><span class="p">;</span>
+
+	<span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+<span class="p">};</span>
+
+<span class="nx">$scope</span><span class="p">.</span><span class="nx">$watch</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+    <span class="k">return</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+<span class="p">},</span> <span class="kd">function</span><span class="p">(</span> <span class="nx">newValue</span><span class="p">,</span> <span class="nx">oldValue</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Input value updated - it is now &#39;</span> <span class="o">+</span> <span class="nx">newValue</span><span class="p">);</span>
+    
+    <span class="nx">element</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nx">value</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span><span class="p">;</span>
+<span class="p">}</span> <span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">updateScopeValue</span> <span class="o">=</span> <span class="kd">function</span> <span class="nx">updateScopeValue</span><span class="p">(</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="s1">&#39;Bob&#39;</span><span class="p">;</span>
+    <span class="nx">$scope</span><span class="p">.</span><span class="nx">$digest</span><span class="p">();</span>
+<span class="p">};</span>
+</pre></div>
+</td></tr></table>
+
+</div>
+
+<p>Perfect - using this approach we can now update the input’s value and it will be reflected in <code>$scope.name</code>, as well as call <code>updateScopeValue</code> and have the input’s value reflect that! <a href="http://jsfiddle.net/ryanclark/S3unb/1/" target="_blank">You can play around with this here.</a></p>
+
+	</div>
+
+  <span class="p">{</span>
+  <span class="err">//</span>
+  <span class="nt">&quot;flux&quot;</span>
+  <span class="s2">&quot;2.0.1&quot;</span>
+  <span class="nt">&quot;react&quot;</span>
+
+	<div class="disqus">
+		<div id="disqus_thread"></div>
+	</div>
+</article>
+
+<script>
+  var disqus_url = "http://ryanclark.me//how-angularjs-implements-dirty-checking";
+  var disqus_title = "How AngularJS implements dirty checking and how to replicate it ourselves";
+  var disqus_shortname = 'rynclark';
+  (function() {
+    var dsq = document.createElement('script');
+    dsq.async = dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    document.getElementsByTagName('head')[0].appendChild(dsq);
+  })();
+</script>
+
+<script>
+  var c = document.querySelector('canvas');
+  var ctx = c.getContext("2d");
+
+  // SVG is resolution independent. Canvas is not. We need to make our canvas
+  // High Resolution.
+
+  // lets get the resolution of our device.
+  var pixelRatio = window.devicePixelRatio || 1;
+
+  // lets scale the canvas and change its CSS width/height to make it high res.
+  c.style.width = c.width +'px';
+  c.style.height = c.height +'px';
+  c.width *= pixelRatio;
+  c.height *= pixelRatio;
+
+  // Now that its high res we need to compensate so our images can be drawn as
+  //normal, by scaling everything up by the pixelRatio.
+  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
+  ctx.translate(-4, 0);
+
+  var cw = c.width;
+  var ch = c.height;
+
+  function createClip(ctx) {
+    ctx.save();
+    ctx.miterLimit=4;
+    ctx.scale(1.0973936899862824,1.0973936899862824);
+    ctx.translate(0.17219917012447183,0);
+    ctx.scale(1.0926694329183957,1.0926694329183957);
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(33.2,31.5);
+    ctx.bezierCurveTo(33.2,36.3,31.400000000000002,39.5,27.900000000000002,41);
+    ctx.lineTo(32.900000000000006,59.9);
+    ctx.bezierCurveTo(33.10000000000001,60.8,32.7,61.199999999999996,31.900000000000006,61.199999999999996);
+    ctx.lineTo(24.400000000000006,61.199999999999996);
+    ctx.bezierCurveTo(23.700000000000006,61.199999999999996,23.300000000000004,60.8,23.200000000000006,60.199999999999996);
+    ctx.lineTo(18.400000000000006,41.89999999999999);
+    ctx.lineTo(13.400000000000006,41.89999999999999);
+    ctx.lineTo(13.400000000000006,60);
+    ctx.bezierCurveTo(13.400000000000006,60.7,13.000000000000005,61.2,12.200000000000006,61.2);
+    ctx.lineTo(4.8,61.2);
+    ctx.bezierCurveTo(4.1,61.2,3.5999999999999996,60.800000000000004,3.5999999999999996,60);
+    ctx.lineTo(3.5999999999999996,4.7);
+    ctx.bezierCurveTo(3.6,4,4,3.6,4.8,3.6);
+    ctx.lineTo(22.900000000000002,3.6);
+    ctx.bezierCurveTo(29.700000000000003,3.6,33.300000000000004,7.2,33.300000000000004,14);
+    ctx.lineTo(33.300000000000004,31.5);
+    ctx.closePath();
+    ctx.moveTo(20.5,32.4);
+    ctx.bezierCurveTo(22.4,32.4,23.4,31.4,23.4,29.5);
+    ctx.lineTo(23.4,16);
+    ctx.bezierCurveTo(23.4,14.1,22.4,13.1,20.5,13.1);
+    ctx.lineTo(13.4,13.1);
+    ctx.lineTo(13.4,32.4);
+    ctx.lineTo(20.5,32.4);
+    ctx.moveTo(69.3,21.7);
+    ctx.bezierCurveTo(69.3,22.4,68.89999999999999,22.9,68.1,22.9);
+    ctx.lineTo(60.89999999999999,22.9);
+    ctx.bezierCurveTo(60.099999999999994,22.9,59.69999999999999,22.5,59.69999999999999,21.7);
+    ctx.lineTo(59.69999999999999,16);
+    ctx.bezierCurveTo(59.69999999999999,14.1,58.69999999999999,13.1,56.79999999999999,13.1);
+    ctx.lineTo(53.09999999999999,13.1);
+    ctx.bezierCurveTo(51.19999999999999,13.1,50.19999999999999,14.1,50.19999999999999,16);
+    ctx.lineTo(50.19999999999999,48.8);
+    ctx.bezierCurveTo(50.19999999999999,50.699999999999996,51.19999999999999,51.699999999999996,53.09999999999999,51.699999999999996);
+    ctx.lineTo(56.79999999999999,51.699999999999996);
+    ctx.bezierCurveTo(58.69999999999999,51.699999999999996,59.69999999999999,50.8,59.69999999999999,48.8);
+    ctx.lineTo(59.69999999999999,43);
+    ctx.bezierCurveTo(59.69999999999999,42.3,60.09999999999999,41.8,60.89999999999999,41.8);
+    ctx.lineTo(68.1,41.8);
+    ctx.bezierCurveTo(68.8,41.8,69.3,42.199999999999996,69.3,43);
+    ctx.lineTo(69.3,50.8);
+    ctx.bezierCurveTo(69.3,57.599999999999994,65.6,61.199999999999996,58.9,61.199999999999996);
+    ctx.lineTo(50.8,61.199999999999996);
+    ctx.bezierCurveTo(44,61.199999999999996,40.4,57.599999999999994,40.4,50.8);
+    ctx.lineTo(40.4,14);
+    ctx.bezierCurveTo(40.4,7.2,44.1,3.5999999999999996,50.8,3.5999999999999996);
+    ctx.lineTo(58.9,3.5999999999999996);
+    ctx.bezierCurveTo(65.6,3.5999999999999996,69.3,7.199999999999999,69.3,14);
+    ctx.lineTo(69.3,21.7);
+    ctx.closePath();
+    ctx.clip();
+  }
+
+  var points = [];
+  var tick = 0;
+  var opt = {
+    count: 5,
+    range: {
+      x: 0,
+      y: 7
+    },
+    duration: {
+      min: 20,
+      max: 100
+    },
+    thickness: 0,
+    strokeColor: '#444',
+    level: 1,
+    curved: true
+  };
+
+  var post = document.querySelector('.contents');
+  var bar = document.querySelector('.header__progress__bar');
+
+  var documentSize = document.body.scrollHeight;
+  var postHeight = post.getBoundingClientRect().top + post.getBoundingClientRect().height;
+
+  var bodyRect = document.body.getBoundingClientRect(),
+    elemRect = post.getBoundingClientRect(),
+    offsets   = elemRect.top - bodyRect.top;
+
+  var offset = c.height + 5;
+
+  ctx.lineWidth = 0;
+  var timeout;
+  function changeWidth() {
+    var scrollPercentage = 1 - ((window.scrollY) / (elemRect.height + offsets - window.innerHeight));
+    offset = (72 * scrollPercentage) + 5;
+    ctx.lineWidth = 16 * Math.max(0, (1 - scrollPercentage) - 0.3);
+
+    opt.range.y = 10;
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      opt.range.y = 2;
+    }, 1000);
+  }
+
+  window.addEventListener('scroll', changeWidth);
+  window.addEventListener('resize', changeWidth);
+
+  function rand(min, max){
+    return Math.floor( (Math.random() * (max - min + 1) ) + min);
+  }
+
+  function ease(t, b, c, d) {
+    if ((t/=d/2) < 1) return c/2*t*t + b;
+    return -c/2 * ((--t)*(t-2) - 1) + b;
+  }
+
+  ctx.lineJoin = 'round';
+
+  var Point = function(config){
+    this.anchorX = config.x;
+    this.anchorY = config.y;
+    this.x = config.x;
+    this.y = config.y;
+    this.setTarget();
+  };
+
+  Point.prototype.setTarget = function(){
+    this.initialX = this.x;
+    this.initialY = this.y;
+    this.targetX = this.anchorX + rand(0, opt.range.x * 2) - opt.range.x;
+    this.targetY = this.anchorY + rand(0, opt.range.y * 2) - opt.range.y;
+    this.tick = 0;
+    this.duration = rand(opt.duration.min, opt.duration.max);
+  }
+
+  Point.prototype.update = function(){
+    var dx = this.targetX - this.x;
+    var dy = this.targetY - this.y;
+    var dist = Math.sqrt(dx * dx + dy * dy);
+
+    if(Math.abs(dist) <= 0){
+      this.setTarget();
+    } else {
+      var t = this.tick;
+      var b = this.initialY;
+      var c = this.targetY - this.initialY;
+      var d = this.duration;
+      this.y = ease(t, b, c, d);
+
+      b = this.initialX;
+      c = this.targetX - this.initialX;
+      d = this.duration;
+      this.x = ease(t, b, c, d);
+
+      this.tick++;
+    }
+  };
+
+  Point.prototype.render = function(){
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, false);
+    ctx.fillStyle = '#000';
+    ctx.fill();
+  };
+
+  var updatePoints = function(){
+    var i = points.length;
+    while(i--){
+      points[i].update();
+    }
+  };
+
+  var renderPoints = function(){
+    var i = points.length;
+    while(i--){
+      points[i].render();
+    }
+  };
+
+  var lotsOfPoints = [];
+
+  function quadraticBezierCurvePoint(t, c) {
+    // compute relative coordinates of a point on the curve using t and c
+    // t is a number between 0 and 1
+    // c is an array of 3 points:
+    //     the initial point of the curve (always (0,0))
+    //     the "handle" point of the curve
+    //     the final point of the curve
+    var t1, t1_2a, t1_2b, t1_2c;
+    t1 = 1 - t;
+    t1_2a = t1 * t1;
+    t1_2b = (2 * t) * t1;
+    t1_2c = t * t;
+    return {
+      x: (c[0].x * t1_2a) + (t1_2b * c[1].x) + (t1_2c * c[2].x),
+      y: (c[0].y * t1_2a) + (t1_2b * c[1].y) + (t1_2c * c[2].y)
+    };
+  }
+  function b2p0(t, p) {
+    var k = 1 - t;
+    return k * k * p;
+  }
+
+  function b2p1(t, p) {
+    return 2 * (1 - t) * t * p;
+  }
+
+  function b2p2(t, p) {
+    return t * t * p;
+  }
+
+  function b2(t, p0, p1, p2) {
+    return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
+  }
+
+  function tangentQuadraticBezier(p0, p1, p2, t) {
+    return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
+  }
+var log = false;
+  var renderShape = function(){
+    lotsOfPoints = [];
+    ctx.beginPath();
+    var pointCount = points.length;
+    ctx.moveTo(points[0].x, points[0].y + offset);
+    var i;
+    for (i = 0; i < pointCount - 1; i++) {
+      var c = (points[i].x + points[i + 1].x) / 2;
+      var d = (points[i].y + points[i + 1].y) / 2;
+      ctx.quadraticCurveTo(points[i].x, points[i].y + offset, c, d + offset);
+    }
+    ctx.lineTo(-opt.range.x - opt.thickness, ch + opt.thickness + offset);
+    ctx.lineTo(cw + opt.range.x + opt.thickness, ch + opt.thickness + offset);
+    ctx.closePath();
+    ctx.fillStyle = pattern2;
+    ctx.fill();
+    ctx.strokeStyle = pattern;
+    ctx.stroke();
+
+    ctx.save();
+
+    for (var i = 0; i < bubbles.length; i++) {
+      bubbles[i].ycoord -= bubbles[i].move;
+      if (bubbles[i].ycoord < (offset + 16)) {
+        bubbles[i].xcoord = getRandomNum(0, cw);
+        bubbles[i].ycoord = ch + maxRadius;
+        bubbles[i].radius = getRandomNum(minRadius, maxRadius);
+        bubbles[i].move = getRandomNum(minMove, maxMove);
+      }
+
+      ctx.beginPath();
+      ctx.arc(bubbles[i].xcoord, bubbles[i].ycoord, bubbles[i].radius, 0, Math.PI*2, false);
+      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+      ctx.fill();
+      ctx.closePath();
+    }
+  };
+
+
+  /**
+   *  Get Random Integer
+   */
+  function getRandomInt (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   *  Get Random Number
+   */
+  function getRandomNum(min, max) {
+    return (Math.random() * (max - min + 1)) + min;
+  }
+
+  var bubbles = new Array();
+  var bubblesNum = 75;
+
+  var minRadius = 1;
+  var maxRadius = 3;
+  var minMove = 0.1;
+  var maxMove = 0.2;
+
+  for (var i = 0; i < bubblesNum; i++) {
+    bubbles[i] = {
+      xcoord: getRandomNum(0, cw),
+      ycoord: getRandomNum(0, ch),
+      radius: getRandomNum(minRadius, maxRadius),
+      move: getRandomNum(minMove, maxMove)
+    }
+  }
+
+  var clear = function(){
+    ctx.clearRect(0, 0, cw, ch);
+  };
+
+  var i = opt.count + 2;
+  var spacing = (cw + (opt.range.x * 2)) / (opt.count-1);
+  while(i--){
+    points.push(new Point({
+      x: (spacing * (i - 1)) - opt.range.x,
+      y: ch - (ch * opt.level)
+    }));
+  }
+
+
+  window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(a,1E3/60)}}();
+
+  var loop = function(){
+    window.requestAnimFrame(loop, c);
+    tick++;
+    clear();
+    createClip(ctx);
+    ctx.fillStyle = "#262626";
+    ctx.fillRect(0, 0, cw, ch);
+
+    updatePoints();
+    renderShape();
+  };
+  var tempCanvas = document.createElement("canvas"),
+    tCtx = tempCanvas.getContext("2d");
+
+  var tempCanvas2 = document.createElement("canvas"),
+    tCtx2 = tempCanvas2.getContext("2d");
+
+  var pattern, pattern2;
+
+  var img1 = new Image();
+  //drawing of the test image - img1
+  img1.onload = function () {
+    tempCanvas.width = cw;
+    tempCanvas.height = 16;
+    tCtx.drawImage(img1, 0, 0, cw, 16, 0, 0, cw, 16);
+    pattern = ctx.createPattern(tempCanvas, 'repeat');
+
+    tempCanvas2.width = cw;
+    tempCanvas2.height = ch;
+    tCtx2.drawImage(img1, 0, 0, img1.width, img1.height, 0, -100, cw, ch + 100);
+    pattern2 = ctx.createPattern(tempCanvas2, 'repeat');
+    loop();
+  };
+
+  img1.src = 'http://static6.bigstockphoto.com/thumbs/1/5/9/small2/95113916.jpg';
+</script>
+
+
+    <div class="main-background">
+      <div class="main-background__left">
+        <div class="main-background__overlay"></div>
+      </div>
+      <div class="main-background__right">
+        <div class="main-background__overlay"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-49723822-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+<script type="text/javascript" src="/js/main.9689d40cfa8b9bd78181.js"></script></body>
+</html>
