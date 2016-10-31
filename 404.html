@@ -18,6 +18,9 @@
 <canvas></canvas>
 
 <script>
+  var widthScale = Math.max(1, Math.min(3, window.innerWidth / (108 * 3)));
+  var heightScale = Math.max(1, Math.min(3, window.innerHeight / (45 * 3)));
+  var scale = Math.min(widthScale, heightScale);
   var width = 108;
   var height = 45;
   function draw404(ctx, w, h) {
@@ -30,9 +33,6 @@
     ctx.save();
     ctx.restore();
     ctx.save();
-    var widthScale = Math.max(1, Math.min(3, Math.floor(window.innerWidth / (108 * 3))));
-    var heightScale = Math.max(1, Math.min(3, Math.floor(window.innerHeight / (45 * 3))));
-    var scale = Math.min(widthScale, heightScale);
     ctx.translate((w / 2) - (width * scale), (h / 2) - (height * scale));
     ctx.scale(scale, scale);
     ctx.beginPath();
@@ -602,10 +602,11 @@
     var random = rand(0, 360);
     // Create canvas & context
     this.ctx = this.canvas.getContext('2d');
-
     // Initialise particles
     this.particles = [];
-    for (var i = 0; i < this.options.number; i++) {
+    var density = Math.floor(window.innerWidth / 8);
+
+    for (var i = 0; i < density; i++) {
       this.particles.push(new Particle(this, {
         hue: rand(random, random + 90),
         saturation: 65,
@@ -613,6 +614,40 @@
         alpha: rand(20, 50)/100
       }));
     }
+
+    var timeout;
+    window.addEventListener('resize', function () {
+      clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        widthScale = Math.max(1, Math.min(3, window.innerWidth / (108 * 3)));
+        heightScale = Math.max(1, Math.min(3, window.innerHeight / (45 * 3)));
+        scale = Math.min(widthScale, heightScale);
+
+        var density = Math.floor(window.innerWidth / 8);
+
+        if (this.particles.length < density) {
+          for (var i = 0; i < density - this.particles.length; i++) {
+            this.particles.push(new Particle(this, {
+              hue: rand(random, random + 90),
+              saturation: 65,
+              lightness: rand(10, 30),
+              alpha: rand(20, 50)/100
+            }));
+          }
+        } else if (density < this.particles.length) {
+          this.particles.splice(0, this.particles.length - density);
+
+          this.particles.forEach(function (particle) {
+            if (particle.x > (cw/pixelRatio) + 4) {
+              particle.x = rand(0, cw / pixelRatio);
+            }
+            if (particle.y > (ch/pixelRatio) + 4) {
+              particle.y = rand(0, ch / pixelRatio);
+            }
+          });
+        }
+      }.bind(this), 500);
+    }.bind(this));
     // Update canvas
     requestAnimationFrame(this.update.bind(this));
   }
