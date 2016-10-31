@@ -10,7 +10,7 @@
             <title>Going native with React, an introduction</title>
             
             
-            <description>&lt;p&gt;As a JavaScript developer, I would’ve never thought that I could make &lt;strong&gt;native&lt;/strong&gt; mobile applications easily in JavaScript. Sure, we have tools such as PhoneGap, but wrapping our browser based application in native application leaves a lot to be desired&lt;/p&gt;
+            <description>&lt;p&gt;As a JavaScript developer, I would’ve never thought that I could make &lt;strong&gt;native&lt;/strong&gt; mobile applications easily in JavaScript&lt;/p&gt;
 
 </description>
             
@@ -36,7 +36,7 @@
             <title>Introduction to Facebook&#39;s Flux architecture</title>
             
             
-            <description>&lt;p&gt;If you’re like me and you wanted to go further with React, you more than likely would’ve checked out &lt;a href=&quot;http://facebook.github.io/flux/docs/overview.html#content&quot; target=&quot;_blank&quot;&gt;Flux&lt;/a&gt;, had a glance, closed the tab and then reassessed your life as a Javascript developer&lt;/p&gt;
+            <description>&lt;p&gt;If you’re like me and you wanted to go further with React, you more than likely would’ve checked out &lt;a href=&quot;http://facebook.github.io/flux/docs/overview.html#content&quot; target=&quot;_blank&quot;&gt;Flux&lt;/a&gt;, had a glance, closed the tab&lt;/p&gt;
 
 </description>
             
@@ -49,7 +49,7 @@
             <title>Getting started with React</title>
             
             
-            <description>&lt;p&gt;React is an insanely powerful framework by the amazing developers over at Facebook. Implementing a virtual DOM, it allows us to render components super fast whilst removing any unnecessary overhead from DOM operations. React is often said to deal with the “V” out of the MVC architecture, however when you mix this with Flux, you can have a full blown front-end framework that allows you to easily keep your model and view in sync&lt;/p&gt;
+            <description>&lt;p&gt;React is an insanely powerful framework by the amazing developers over at Facebook. Implementing a virtual DOM&lt;/p&gt;
 
 </description>
             
@@ -62,7 +62,7 @@
             <title>How AngularJS implements dirty checking and how to replicate it ourselves</title>
             
             
-            <description>&lt;p&gt;AngularJS implements dirty checking for two way data binding on $scope variables. Unlike dynamically setting up setters and getters, which is how Ember.js does two way data binding, dirty checking allows Angular to watch for variables that may or may not exist&lt;/p&gt;
+            <description>&lt;p&gt;AngularJS implements dirty checking for two way data binding on $scope variables. Unlike dynamically setting up setters and getters&lt;/p&gt;
 
 </description>
             

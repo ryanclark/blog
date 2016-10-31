@@ -11,92 +11,86 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700">
 
   <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
-<link href="/css/main.25eabe2753f8eeedaeb525e59f2c63b3.css" rel="stylesheet"></head>
+<link href="/css/main.746b571f88a312070ff0756f1ef082ce.css" rel="stylesheet"></head>
 <body>
 
 
 <aside class="sidebar">
-  <div class="sidebar__fixed">
-    <div class="sidebar__info">
-      
-      <a href="/" class="logo">
-        <canvas width="72px" height="72px"></canvas>
-      </a>
-      
+  <div class="sidebar__info">
+    
+    <a href="/" class="logo">
+      <canvas width="72px" height="72px"></canvas>
+    </a>
+    
 
-      <div class="sidebar__overlay ">
-        <span class="sidebar__title">ryanclark.me</span>
+    <div class="sidebar__overlay ">
+      <span class="sidebar__title">ryanclark.me</span>
 
-        <ul class="social">
-          <li class="social__item">
-            <a target="_blank" href="https://twitter.com/rynclark">
-              <i class="fa fa-fw fa-twitter"></i>
-            </a>
-          </li>
-          <li class="social__item">
-            <a target="_blank" href="/feed.xml">
-              <i class="fa fa-fw fa-rss"></i>
-            </a>
-          </li>
-          <li class="social__item">
-            <a target="_blank" href="http://github.com/rynclark">
-              <i class="fa fa-fw fa-github"></i>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <nav class="navigation">
-      <ul class="navigation__list">
-        <li class="navigation__item">
-          <h3 class="navigation__header">React</h3>
-        </li>
-        <li class="navigation__item">
-          <a href="/going-native-with-react/" class="navigation__link">
-            Go native with React
+      <ul class="social">
+        <li class="social__item">
+          <a target="_blank" href="https://twitter.com/rynclark">
+            <i class="fa fa-fw fa-twitter"></i>
           </a>
         </li>
-        <li class="navigation__item">
-          <a href="/getting-started-with-flux/" class="navigation__link">
-            Introduction to Flux
+        <li class="social__item">
+          <a target="_blank" href="/feed.xml">
+            <i class="fa fa-fw fa-rss"></i>
           </a>
         </li>
-        <li class="navigation__item">
-          <a href="/getting-started-with-react/" class="navigation__link">
-            Getting started with React
+        <li class="social__item">
+          <a target="_blank" href="http://github.com/rynclark">
+            <i class="fa fa-fw fa-github"></i>
           </a>
         </li>
       </ul>
-      <ul class="navigation__list">
-        <li class="navigation__item">
-          <h3 class="navigation__header">Angular</h3>
-        </li>
-        <li class="navigation__item">
-          <h4 class="navigation__sub-header">1.x</h4>
-        </li>
-        <li class="navigation__item">
-          <a href="/how-angularjs-implements-dirty-checking/" class="navigation__link">
-            How Angular dirty checks
-          </a>
-        </li>
-      </ul>
-      <ul class="navigation__list">
-        <li class="navigation__item">
-          <h3 class="navigation__header">Misc</h3>
-        </li>
-        <li class="navigation__item">
-          <a href="/rgb-to-hex-via-binary-shifting/" class="navigation__link">
-            RGB to hex via binary shifting
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <div class="sidebar__progress">
-      <div class="sidebar__progress__bar"></div>
     </div>
   </div>
+
+  <nav class="navigation">
+    <ul class="navigation__list">
+      <li class="navigation__item">
+        <h3 class="navigation__header">React</h3>
+      </li>
+      <li class="navigation__item">
+        <a href="/going-native-with-react/" class="navigation__link">
+          Go native with React
+        </a>
+      </li>
+      <li class="navigation__item">
+        <a href="/getting-started-with-flux/" class="navigation__link">
+          Introduction to Flux
+        </a>
+      </li>
+      <li class="navigation__item">
+        <a href="/getting-started-with-react/" class="navigation__link">
+          Getting started with React
+        </a>
+      </li>
+    </ul>
+    <ul class="navigation__list">
+      <li class="navigation__item">
+        <h3 class="navigation__header">Angular</h3>
+      </li>
+      <li class="navigation__item">
+        <h4 class="navigation__sub-header">1.x</h4>
+      </li>
+      <li class="navigation__item">
+        <a href="/how-angularjs-implements-dirty-checking/" class="navigation__link">
+          How Angular dirty checks
+        </a>
+      </li>
+    </ul>
+    <ul class="navigation__list">
+      <li class="navigation__item">
+        <h3 class="navigation__header">Misc</h3>
+      </li>
+      <li class="navigation__item">
+        <a href="/rgb-to-hex-via-binary-shifting/" class="navigation__link">
+          RGB to hex via binary shifting
+        </a>
+      </li>
+    </ul>
+  </nav>
 </aside>
 
 <section class="content">
@@ -126,7 +120,7 @@
     </div>
 
 
-	  <p>React is an insanely powerful framework by the amazing developers over at Facebook. Implementing a virtual DOM, it allows us to render components super fast whilst removing any unnecessary overhead from DOM operations. React is often said to deal with the “V” out of the MVC architecture, however when you mix this with Flux, you can have a full blown front-end framework that allows you to easily keep your model and view in sync<!--more--> - more on Flux soon.</p>
+	  <p>React is an insanely powerful framework by the amazing developers over at Facebook. Implementing a virtual DOM<!--more-->, it allows us to render components super fast whilst removing any unnecessary overhead from DOM operations. React is often said to deal with the “V” out of the MVC architecture, however when you mix this with Flux, you can have a full blown front-end framework that allows you to easily keep your model and view in sync - more on Flux soon.</p>
 
 <h1 id="components">Components</h1>
 <p>In React you can create components that have special functionality that you won’t find in a HTML element, i.e. a dropdown navigation, which we will be creating in this tutorial. Each component is contained in its own “scope”, so we can define the functionality of the component and reuse it as many times as we want without them interfering with each other.</p>
@@ -1125,6 +1119,17 @@
   var c = document.querySelector('canvas');
   var ctx = c.getContext("2d");
 
+  var started = window.innerWidth >= 800;
+
+  window.addEventListener('resize', function () {
+    var newStarted = window.innerWidth >= 800;
+    if (!started && newStarted) {
+      started = newStarted;
+      loop();
+    }
+    started = newStarted;
+  });
+
   // SVG is resolution independent. Canvas is not. We need to make our canvas
   // High Resolution.
 
@@ -1455,7 +1460,9 @@ var log = false;
   window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(a,1E3/60)}}();
 
   var loop = function(){
-    window.requestAnimFrame(loop, c);
+    if (started) {
+      window.requestAnimFrame(loop, c);
+    }
     tick++;
     clear();
     createClip(ctx);
