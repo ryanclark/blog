@@ -62,9 +62,10 @@
     "url": "git+https://github.com/gatsbyjs/gatsby-starter-blog.git"
   },
   "scripts": {
-    "build": "yarn clean && gatsby build && cp -r labs public/labs",
+    "build": "yarn clean && gatsby build && yarn copy",
     "clean": "rimraf public",
     "develop": "gatsby develop",
+    "copy": "cp CNAME public/CNAME && cp -r labs public/labs",
     "deploy": "yarn build && gh-pages -d public",
     "format": "prettier --write src/**/*.{js,jsx}",
     "start": "npm run develop",
