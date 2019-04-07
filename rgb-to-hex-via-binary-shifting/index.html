@@ -1,1403 +1,273 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-  <title>RGB to Hex via Binary Shifting</title>
-
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700">
-
-  <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml" />
-<link href="/css/main.f25a960dcc3e869645c45bd3a7edf2bd.css" rel="stylesheet"></head>
-<body>
-
-
-<aside class="sidebar">
-  <div class="sidebar__info">
-    
-    <a href="/" class="logo">
-      <canvas width="72px" height="72px"></canvas>
-    </a>
-    
-
-    <div class="sidebar__overlay ">
-      <span class="sidebar__title">ryanclark.me</span>
-
-      <ul class="social">
-        <li class="social__item">
-          <a target="_blank" href="https://twitter.com/rynclark">
-            <i class="fa fa-fw fa-twitter"></i>
-          </a>
-        </li>
-        <li class="social__item">
-          <a target="_blank" href="/feed.xml">
-            <i class="fa fa-fw fa-rss"></i>
-          </a>
-        </li>
-        <li class="social__item">
-          <a target="_blank" href="http://github.com/rynclark">
-            <i class="fa fa-fw fa-github"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <nav class="navigation">
-    <ul class="navigation__list">
-      <li class="navigation__item">
-        <h3 class="navigation__header">React</h3>
-      </li>
-      <li class="navigation__item">
-        <a href="/going-native-with-react/" class="navigation__link">
-          Go native with React
-        </a>
-      </li>
-      <li class="navigation__item">
-        <a href="/getting-started-with-flux/" class="navigation__link">
-          Introduction to Flux
-        </a>
-      </li>
-      <li class="navigation__item">
-        <a href="/getting-started-with-react/" class="navigation__link">
-          Getting started with React
-        </a>
-      </li>
-    </ul>
-    <ul class="navigation__list">
-      <li class="navigation__item">
-        <h3 class="navigation__header">Angular</h3>
-      </li>
-      <li class="navigation__item">
-        <h4 class="navigation__sub-header">1.x</h4>
-      </li>
-      <li class="navigation__item">
-        <a href="/how-angularjs-implements-dirty-checking/" class="navigation__link">
-          How Angular dirty checks
-        </a>
-      </li>
-    </ul>
-    <ul class="navigation__list">
-      <li class="navigation__item">
-        <h3 class="navigation__header">Misc</h3>
-      </li>
-      <li class="navigation__item">
-        <a href="/rgb-to-hex-via-binary-shifting/" class="navigation__link">
-          RGB to hex via binary shifting
-        </a>
-      </li>
-    </ul>
-  </nav>
-</aside>
-
-<section class="content">
-  <div class="container">
-    <article class="article">
-	<header>
-		<h2>RGB to Hex via Binary Shifting</h2>
-		<span class="time">16 Apr 2015</span>
-	</header>
-
-  <div class="post contents">
-
-
-
-	  <p>A colleague of mine presented me with this code, baffled as to how it works<!--more--> -</p>
-
-<div class="code-block">
-
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js">1
-2
-3</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">rgbToHex</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">24</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">r</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="nx">g</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="nx">b</span><span class="p">).</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-<span class="p">}</span>
-</pre></div>
-</td></tr></table>
-
-</div>
-
+<!DOCTYPE html><html><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="ie=edge"/><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"/><link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet"/><style id="typography.js">html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block}audio:not([controls]){display:none;height:0}progress{vertical-align:baseline}[hidden],template{display:none}a{background-color:transparent;-webkit-text-decoration-skip:objects}a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:inherit;font-weight:bolder}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background-color:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}svg:not(:root){overflow:hidden}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}figure{margin:1em 40px}hr{box-sizing:content-box;height:0;overflow:visible}button,input,optgroup,select,textarea{font:inherit;margin:0}optgroup{font-weight:700}button,input{overflow:visible}button,select{text-transform:none}[type=reset],[type=submit],button,html [type=button]{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-cancel-button,[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-input-placeholder{color:inherit;opacity:.54}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}html{font:100%/26px 'Open Sans',sans-serif;box-sizing:border-box;overflow-y:scroll;}*{box-sizing:inherit;}*:before{box-sizing:inherit;}*:after{box-sizing:inherit;}body{color:hsla(0,0%,0%,0.8);font-family:'Open Sans',sans-serif;font-weight:normal;word-wrap:break-word;font-kerning:normal;-moz-font-feature-settings:"kern", "liga", "clig", "calt";-ms-font-feature-settings:"kern", "liga", "clig", "calt";-webkit-font-feature-settings:"kern", "liga", "clig", "calt";font-feature-settings:"kern", "liga", "clig", "calt";}img{max-width:100%;margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}h1{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:2rem;line-height:1.1;}h2{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1.51572rem;line-height:1.1;}h3{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1.31951rem;line-height:1.1;}h4{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:1rem;line-height:1.1;}h5{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:0.87055rem;line-height:1.1;}h6{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;color:inherit;font-family:-apple-system,'BlinkMacSystemFont','Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;font-weight:bold;text-rendering:optimizeLegibility;font-size:0.81225rem;line-height:1.1;}hgroup{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}ul{margin-left:1.625rem;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;list-style-position:outside;list-style-image:none;}ol{margin-left:1.625rem;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;list-style-position:outside;list-style-image:none;}dl{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}dd{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}p{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}figure{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}pre{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;font-size:0.85rem;line-height:1.625rem;}table{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;font-size:1rem;line-height:1.625rem;border-collapse:collapse;width:100%;}fieldset{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}blockquote{margin-left:1.625rem;margin-right:1.625rem;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}form{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}noscript{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}iframe{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}hr{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:calc(1.625rem - 1px);background:hsla(0,0%,0%,0.2);border:none;height:1px;}address{margin-left:0;margin-right:0;margin-top:0;padding-bottom:0;padding-left:0;padding-right:0;padding-top:0;margin-bottom:1.625rem;}b{font-weight:bold;}strong{font-weight:bold;}dt{font-weight:bold;}th{font-weight:bold;}li{margin-bottom:calc(1.625rem / 2);}ol li{padding-left:0;}ul li{padding-left:0;}li > ol{margin-left:1.625rem;margin-bottom:calc(1.625rem / 2);margin-top:calc(1.625rem / 2);}li > ul{margin-left:1.625rem;margin-bottom:calc(1.625rem / 2);margin-top:calc(1.625rem / 2);}blockquote *:last-child{margin-bottom:0;}li *:last-child{margin-bottom:0;}p *:last-child{margin-bottom:0;}li > p{margin-bottom:calc(1.625rem / 2);}code{font-size:0.85rem;line-height:1.625rem;}kbd{font-size:0.85rem;line-height:1.625rem;}samp{font-size:0.85rem;line-height:1.625rem;}abbr{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;}acronym{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;}abbr[title]{border-bottom:1px dotted hsla(0,0%,0%,0.5);cursor:help;text-decoration:none;}thead{text-align:left;}td,th{text-align:left;border-bottom:1px solid hsla(0,0%,0%,0.12);font-feature-settings:"tnum";-moz-font-feature-settings:"tnum";-ms-font-feature-settings:"tnum";-webkit-font-feature-settings:"tnum";padding-left:1.08333rem;padding-right:1.08333rem;padding-top:0.8125rem;padding-bottom:calc(0.8125rem - 1px);}th:first-child,td:first-child{padding-left:0;}th:last-child,td:last-child{padding-right:0;}a{color:#007acc;text-decoration:none;}</style><link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><style data-href="/styles.b26664ecbc2499dd04c9.css">.scroll{width:100%;overflow-x:auto}code[class*=language-],pre[class*=language-]{color:#f8f8f2;background:none;font-family:Menlo,Andale Mono,Ubuntu Mono,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto;border-radius:.3em;background:#282a36}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#6272a4}.token.punctuation{color:#f8f8f2}.namespace{opacity:.7}.token.number{color:#f78c6c}.token.builtin,.token.char,.token.inserted,.token.selector{color:#50fa7b}.token.string{color:#c3e88d}.token.attr-name{color:#ffcb6b}.token.tag,.token.tag .token.class-name{color:#f07178}.language-css .token.string,.style .token.string,.token.entity,.token.operator,.token.url,.token.variable{color:#f8f8f2}.token.atrule,.token.class-name,.token.function{color:#82aaff}.token.attr-value,.token.attr-value .token.punctuation{color:#c3e88d}.token.boolean,.token.keyword{color:#c792ea}.token.important,.token.regex{color:#ffb86c}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}code.language-text{background:rgba(0,0,0,.05);font-family:Menlo,monospace;color:rgba(0,0,0,.8);padding:0 3px;border:1px solid rgba(0,0,0,.1);border-radius:3px}</style><link rel="sitemap" type="application/xml" href="/sitemap.xml"/><link rel="shortcut icon" href="/icons/icon-48x48.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="manifest" href="/manifest.webmanifest"/><meta name="theme-color" content="#2D3C3F"/><link rel="apple-touch-icon" sizes="48x48" href="/icons/icon-48x48.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><meta name="generator" content="Gatsby 2.2.3"/><link rel="apple-touch-icon" sizes="256x256" href="/icons/icon-256x256.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png?v=8b8d709ee1c3500b70b3f9527cc92c77f9778614"/><title data-react-helmet="true">RGB to Hex via Binary Shifting | ryanclark.me</title><meta data-react-helmet="true" name="description" content="A colleague of mine presented me with this code, baffled as to how it works. We know it converts an RGB value to it’s hexadecimal equivalent, but how? It’s…"/><meta data-react-helmet="true" property="og:title" content="RGB to Hex via Binary Shifting"/><meta data-react-helmet="true" property="og:description" content="A colleague of mine presented me with this code, baffled as to how it works. We know it converts an RGB value to it’s hexadecimal equivalent, but how? It’s…"/><meta data-react-helmet="true" property="og:type" content="website"/><meta data-react-helmet="true" name="twitter:card" content="summary"/><meta data-react-helmet="true" name="twitter:creator" content="Ryan Clark"/><meta data-react-helmet="true" name="twitter:title" content="RGB to Hex via Binary Shifting"/><meta data-react-helmet="true" name="twitter:description" content="A colleague of mine presented me with this code, baffled as to how it works. We know it converts an RGB value to it’s hexadecimal equivalent, but how? It’s…"/><link as="script" rel="preload" href="/component---src-templates-blog-post-tsx-183a370a05221aadf4d8.js"/><link as="script" rel="preload" href="/9-0c2af406927ebc328aa0.js"/><link as="script" rel="preload" href="/0-598e12153a4b2f19d440.js"/><link as="script" rel="preload" href="/app-6cffb0c4ad93a48e7404.js"/><link as="script" rel="preload" href="/styles-99a47daf12289a4bd376.js"/><link as="script" rel="preload" href="/webpack-runtime-15e612511969a13b1fa1.js"/><link as="fetch" rel="preload" href="/static/d/941/path---rgb-to-hex-via-binary-shifting-257-dda-5YJQv9kvAfPDrpXYGnIJVCFyU.json" crossorigin="use-credentials"/></head><body><div id="___gatsby"><div style="outline:none" tabindex="-1" role="group"><style data-emotion-css="i2srys">.css-i2srys{max-width:1200px;padding-top:50px;margin:0 auto;}</style><div class="css-i2srys e1i1zd320"><style data-emotion-css="cnyx0w">.css-cnyx0w{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:justify;-webkit-justify-content:space-between;-ms-flex-pack:justify;justify-content:space-between;}@media (max-width:800px){.css-cnyx0w{padding:0 15px;}}</style><header class="css-cnyx0w e1i1zd323"><style data-emotion-css="zjk0ag">.css-zjk0ag{-webkit-text-decoration:none;text-decoration:none;box-shadow:none;}.css-zjk0ag:hover{-webkit-text-decoration:none;text-decoration:none;}</style><a class="css-zjk0ag e1i1zd321" href="/"><style data-emotion-css="1thzyjp">.css-1thzyjp{display:-webkit-inline-box;display:-webkit-inline-flex;display:-ms-inline-flexbox;display:inline-flex;-webkit-align-items:center;-webkit-box-align:center;-ms-flex-align:center;align-items:center;font-family:menlo,monospace;font-weight:600;color:#F36964;font-size:28px;position:relative;}</style><div class="css-1thzyjp ehjmckk2"><style data-emotion-css="1tx8c9d">.css-1tx8c9d{color:#56E386;margin-right:14px;}</style><div class="css-1tx8c9d ehjmckk0">➜</div><style data-emotion-css="7slaet">.css-7slaet{color:#93a1a1;margin-right:10px;position:relative;top:-1px;}</style><div class="css-7slaet ehjmckk1">~</div>ryan.clark</div></a><style data-emotion-css="hz653u">.css-hz653u{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}.css-hz653u svg{width:32px;height:32px;}</style><header class="css-hz653u e1i1zd324"><style data-emotion-css="11dpuo7">.css-11dpuo7{margin-left:15px;}.css-11dpuo7 svg{fill:#262626;}</style><a href="https://github.com/rynclark" target="_blank" class="css-11dpuo7 e1i1zd322"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24"><g id="surface1"><path d="M 4.0625 4 C 4.0625 4 3.53125 4.925781 3.53125 6.5 C 3.53125 7.546875 3.765625 8.125 3.9375 8.40625 C 2.734375 9.660156 2 11.347656 2 13.53125 C 2 19.125 5.527344 21 12 21 C 18.472656 21 22 19.125 22 13.53125 C 22 11.269531 21.304688 9.574219 20.15625 8.34375 C 20.441406 7.488281 20.769531 5.871094 19.96875 4 C 17.582031 4 15.570313 5.839844 15.5 5.90625 C 14.386719 5.660156 13.210938 5.53125 12 5.53125 C 10.761719 5.53125 9.542969 5.6875 8.40625 5.96875 C 6.808594 4.378906 4.886719 4 4.0625 4 Z M 15.21875 12 C 15.820313 11.992188 16.386719 12.054688 16.875 12.21875 C 18.179688 12.660156 19 13.945313 19 15.375 C 18.996094 19.339844 16.996094 20 11.875 20 C 8.066406 20 4.96875 19.285156 4.96875 15.5 C 4.96875 14.054688 5.71875 13.226563 6.25 12.71875 C 7.417969 11.601563 9.257813 12.15625 11.875 12.15625 C 13.0625 12.15625 14.214844 12.011719 15.21875 12 Z M 8 14 C 7.449219 14 7 14.671875 7 15.5 C 7 16.328125 7.449219 17 8 17 C 8.550781 17 9 16.328125 9 15.5 C 9 14.671875 8.550781 14 8 14 Z M 16 14 C 15.449219 14 15 14.671875 15 15.5 C 15 16.328125 15.449219 17 16 17 C 16.550781 17 17 16.328125 17 15.5 C 17 14.671875 16.550781 14 16 14 Z "></path></g></svg></a><a href="https://twitter.com/rynclark" target="_blank" class="css-11dpuo7 e1i1zd322"><svg viewBox="0 0 48 48" width="1em" height="1em"><g id="surface1"><path fill="#03A9F4;" d="M 42 12.429688 C 40.675781 13.015625 39.253906 13.40625 37.753906 13.589844 C 39.277344 12.683594 40.453125 11.238281 41.003906 9.53125 C 39.574219 10.371094 37.992188 10.984375 36.3125 11.308594 C 34.96875 9.882813 33.050781 9 30.925781 9 C 26.847656 9 23.539063 12.277344 23.539063 16.320313 C 23.539063 16.890625 23.605469 17.449219 23.730469 17.988281 C 17.59375 17.683594 12.148438 14.765625 8.507813 10.335938 C 7.867188 11.417969 7.507813 12.683594 7.507813 14.023438 C 7.507813 16.5625 8.808594 18.800781 10.792969 20.117188 C 9.582031 20.082031 8.441406 19.742188 7.445313 19.203125 C 7.445313 19.226563 7.445313 19.257813 7.445313 19.289063 C 7.445313 22.839844 9.992188 25.796875 13.367188 26.472656 C 12.75 26.640625 12.097656 26.734375 11.425781 26.734375 C 10.949219 26.734375 10.484375 26.679688 10.035156 26.597656 C 10.972656 29.5 13.699219 31.621094 16.933594 31.683594 C 14.402344 33.644531 11.21875 34.820313 7.757813 34.820313 C 7.160156 34.820313 6.574219 34.785156 5.996094 34.714844 C 9.269531 36.785156 13.152344 38 17.320313 38 C 30.90625 38 38.339844 26.84375 38.339844 17.164063 C 38.339844 16.847656 38.328125 16.53125 38.3125 16.222656 C 39.761719 15.195313 41.011719 13.90625 42 12.429688 "></path></g></svg></a></header></header><style data-emotion-css="fltxi7">.css-fltxi7{max-width:800px;margin:100px auto 0;}@media (max-width:800px){.css-fltxi7{margin:20px auto 0;padding:10px 15px;}}</style><main class="css-fltxi7 e1i1zd325"><style data-emotion-css="1myjwgk">.css-1myjwgk{font-family:Oswald,sans-serif;text-transform:uppercase;font-size:100px;max-width:660px;line-height:110px;color:#282A36;margin-bottom:35px;}@media (max-width:800px){.css-1myjwgk{font-size:42px;line-height:48px;}}</style><h1 class="css-1myjwgk e1xte7000">RGB to Hex via Binary Shifting</h1><p style="font-size:0.87055rem;line-height:1.625rem;display:block;margin-bottom:1.625rem;margin-top:-1.625rem">April 16, 2015</p><div><p>A colleague of mine presented me with this code, baffled as to how it works.</p>
+<div class="gatsby-highlight" data-language="js"><pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">rgbToHex</span><span class="token punctuation">(</span><span class="token parameter">r<span class="token punctuation">,</span> g<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">return</span> <span class="token string">"#"</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span>r <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span>g <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span> <span class="token operator">+</span> b<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre></div>
 <p>We know it converts an RGB value to it’s hexadecimal equivalent, but how? It’s doing some crazy stuff with binary, but when broken down it’s actually incredibly simple and very clever.</p>
-
-<h2 id="hex-codes">Hex Codes</h2>
-
+<h2>Hex Codes</h2>
 <p>Hex codes are six characters long, the first two being red, middle two being green and the last two being blue. Each character is a hexadecimal number.</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th>R</th>
-        <th>R</th>
-        <th>G</th>
-        <th>G</th>
-        <th>B</th>
-        <th>B</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>#</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
+<div class="scroll" markdown="1">
+<table>
+<thead>
+<tr>
+<th></th>
+<th>R</th>
+<th>R</th>
+<th>G</th>
+<th>G</th>
+<th>B</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>#</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
 </div>
-
-<h4 id="hexadecimal-numbers">Hexadecimal Numbers</h4>
-
-<p>A hex value can go from <code>0</code> to <code>F</code> - a maximum of 16 different values. When putting two together, we can now have a maximum of 256 (16 multiplied by 16) values (<code>0</code> through to <code>255</code>). We can represent <code>0</code> through to <code>255</code> in 8 bits.</p>
-
+<h3>Hexadecimal Numbers</h3>
+<p>A hex value can go from <code class="language-text">0</code> to <code class="language-text">F</code> - a maximum of 16 different values. When putting two together, we can now have a maximum of 256 (16 multiplied by 16) values (<code class="language-text">0</code> through to <code class="language-text">255</code>). We can represent <code class="language-text">0</code> through to <code class="language-text">255</code> in 8 bits.</p>
 <p><em>0 represented in 8 bits</em></p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th>128</th>
-        <th>64</th>
-        <th>32</th>
-        <th>16</th>
-        <th>8</th>
-        <th>4</th>
-        <th>2</th>
-        <th>1</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
+<div class="scroll" markdown="1">
+<table>
+<thead>
+<tr>
+<th>128</th>
+<th>64</th>
+<th>32</th>
+<th>16</th>
+<th>8</th>
+<th>4</th>
+<th>2</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
 </div>
-
 <p><em>256 represented in 8 bits</em></p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th>128</th>
-        <th>64</th>
-        <th>32</th>
-        <th>16</th>
-        <th>8</th>
-        <th>4</th>
-        <th>2</th>
-        <th>1</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>
-
+<div class="scroll" markdown="1">
+<table>
+<thead>
+<tr>
+<th>128</th>
+<th>64</th>
+<th>32</th>
+<th>16</th>
+<th>8</th>
+<th>4</th>
+<th>2</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
 </div>
-
 <p>This means that red, green and blue can have 256 different variations each - that’s 16,581,375 colours we can reference in just 6 characters!</p>
-
-<h2 id="double-arrow">Double Arrow?</h2>
-
-<p>If you don’t know about bitwise operators, you might be very confused to see a <code>&lt;&lt;</code> in JavaScript. Don’t worry, what it does is very easy to understand.</p>
-
-<p>The <code>&lt;&lt;</code> operator is also known as a left shift. This will shift the value of <code>r</code> 16 bits to the left. You can, at a maximum, shift a number 31 bits to the left.</p>
-
-<h4 id="lets-do-an-example">Let’s do an example</h4>
-
-<p>The number one, represented as a decimal, is <code>1</code>. Represented as binary (in 17 bits for the sake of consistency), is -</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th>65536</th>
-        <th>32768</th>
-        <th>16384</th>
-        <th>8192</th>
-        <th>4096</th>
-        <th>2048</th>
-        <th>1024</th>
-        <th>512</th>
-        <th>256</th>
-        <th>128</th>
-        <th>64</th>
-        <th>32</th>
-        <th>16</th>
-        <th>8</th>
-        <th>4</th>
-        <th>2</th>
-        <th>1</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-      </tr>
-    </tbody>
-  </table>
-
+<h2>Double Arrow?</h2>
+<p>If you don’t know about bitwise operators, you might be very confused to see a <code class="language-text">&lt;&lt;</code> in JavaScript. Don’t worry, what it does is very easy to understand.</p>
+<p>The <code class="language-text">&lt;&lt;</code> operator is also known as a left shift. This will shift the value of <code class="language-text">r</code> 16 bits to the left. You can, at a maximum, shift a number 31 bits to the left.</p>
+<h3>Let’s do an example</h3>
+<p>The number one, represented as a decimal, is <code class="language-text">1</code>. Represented as binary (in 17 bits for the sake of consistency), is -</p>
+<div class="scroll" markdown="1">
+<table>
+<thead>
+<tr>
+<th>65536</th>
+<th>32768</th>
+<th>16384</th>
+<th>8192</th>
+<th>4096</th>
+<th>2048</th>
+<th>1024</th>
+<th>512</th>
+<th>256</th>
+<th>128</th>
+<th>64</th>
+<th>32</th>
+<th>16</th>
+<th>8</th>
+<th>4</th>
+<th>2</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
 </div>
-
-<p>When we shift <code>1</code> 16 bits to the left, we’re adding 16 <code>0</code>’s to the right of the one.</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th>65536</th>
-        <th>32768</th>
-        <th>16384</th>
-        <th>8192</th>
-        <th>4096</th>
-        <th>2048</th>
-        <th>1024</th>
-        <th>512</th>
-        <th>256</th>
-        <th>128</th>
-        <th>64</th>
-        <th>32</th>
-        <th>16</th>
-        <th>8</th>
-        <th>4</th>
-        <th>2</th>
-        <th>1</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-      </tr>
-    </tbody>
-  </table>
-
+<p>When we shift <code class="language-text">1</code> 16 bits to the left, we’re adding 16 <code class="language-text">0</code>’s to the right of the one.</p>
+<div class="scroll" markdown="1">
+<table>
+<thead>
+<tr>
+<th>65536</th>
+<th>32768</th>
+<th>16384</th>
+<th>8192</th>
+<th>4096</th>
+<th>2048</th>
+<th>1024</th>
+<th>512</th>
+<th>256</th>
+<th>128</th>
+<th>64</th>
+<th>32</th>
+<th>16</th>
+<th>8</th>
+<th>4</th>
+<th>2</th>
+<th>1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
 </div>
-
-<p>Which as a decimal, is equal to <code>65536</code>.</p>
-
+<p>Which as a decimal, is equal to <code class="language-text">65536</code>.</p>
 <p>That’s all it does! Told you it was simple.</p>
-
-<h2 id="breaking-it-down">Breaking it down</h2>
-
+<h2>Breaking it down</h2>
 <p>We’re going to start with the middle section - the part that deals with converting the red value to hexadecimal.</p>
-
-<h4 id="red">Red</h4>
-
-<p>The code that does this is <code>(r &lt;&lt; 16)</code>. The red value is always first in a hex code, so in order to make room for green and blue, we shift it 16 bits to the left. This gives us the red value in binary, as well as 16 bits on the end - 8 bits for green and 8 bits for blue.</p>
-
-<p>If we do <code>(255 &lt;&lt; 16)</code>, we get the binary</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<p>Which, when converted to hexadecimal, is equal to <span style="width: 10px; height: 10px; display: inline-block; background: #ff0000"></span> <code>ff0000</code>.</p>
-
-<h4 id="green">Green</h4>
-
-<p>Now that we have converted red to binary and left room for green and blue, we can shift the green value 8 bits to the left. The code that does this is <code>(g &lt;&lt; 8)</code>.</p>
-
+<h3>Red</h3>
+<p>The code that does this is <code class="language-text">(r &lt;&lt; 16)</code>. The red value is always first in a hex code, so in order to make room for green and blue, we shift it 16 bits to the left. This gives us the red value in binary, as well as 16 bits on the end - 8 bits for green and 8 bits for blue.</p>
+<p>If we do <code class="language-text">(255 &lt;&lt; 16)</code>, we get the binary</p>
+<p><code class="language-text">111111110000000000000000</code></p>
+<p>Which, when converted to hexadecimal, is equal to <span style="width: 10px; height: 10px; display: inline-block; background: #ff0000"></span> <code class="language-text">ff0000</code>.</p>
+<h3>Green</h3>
+<p>Now that we have converted red to binary and left room for green and blue, we can shift the green value 8 bits to the left. The code that does this is <code class="language-text">(g &lt;&lt; 8)</code>.</p>
 <p>If we shift 255 to the left by 8 bits and represent it in 24 bits, we get this -</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<p>Which, as hexadecimal, is equal to <span style="width: 10px; height: 10px; display: inline-block; background: #00ff00"></span> <code>00ff00</code>.</p>
-
+<p><code class="language-text">000000001111111100000000</code></p>
+<p>Which, as hexadecimal, is equal to <span style="width: 10px; height: 10px; display: inline-block; background: #00ff00"></span> <code class="language-text">00ff00</code>.</p>
 <p>If you compare that table and the table in the red section, you can see that they line up perfectly - we can add the two values together without them conflicting.</p>
-
 <p><em>Take the red value</em></p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
+<p><code class="language-text">111111110000000000000000</code></p>
 <p><em>add the green value</em></p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
+<p><code class="language-text">000000001111111100000000</code></p>
 <p><em>and we get</em></p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<p>When this is converted to hexadecimal, it is <span style="width: 10px; height: 10px; display: inline-block; background: #ffff00"></span> <code>ffff00</code> - the correct representation of <code>rgb(255, 255, 0)</code> as a hex.</p>
-
-<h4 id="blue">Blue</h4>
-
-<p>We don’t need to shift our blue value to the left, because we are taking up the last 8 bits with it. If you look at the original code, you can see it just does <code>+ b</code> at the end. This is because when adding a binary number and a decimal number in JavaScript, the decimal will be converted over to binary before it’s added.</p>
-
+<p><code class="language-text">111111111111111100000000</code></p>
+<p>When this is converted to hexadecimal, it is <span style="width: 10px; height: 10px; display: inline-block; background: #ffff00"></span> <code class="language-text">ffff00</code> - the correct representation of <code class="language-text">rgb(255, 255, 0)</code> as a hex.</p>
+<h3>Blue</h3>
+<p>We don’t need to shift our blue value to the left, because we are taking up the last 8 bits with it. If you look at the original code, you can see it just does <code class="language-text">+ b</code> at the end. This is because when adding a binary number and a decimal number in JavaScript, the decimal will be converted over to binary before it’s added.</p>
 <p>If our blue value is 255, the binary representation of it is (again, in 24 bits)</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
+<p><code class="language-text">000000000000000011111111</code></p>
 <p>Which, when added to our red and green value, outputs</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td>1</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
-<p>Which is equal to “ffffff” when converted to a hexadecimal! Most of you will know that this colour is in fact white, or <code>rgb(255, 255, 255)</code>.</p>
-
-<h4 id="padding">Padding</h4>
-
-<p>Wait a minute - what’s that <code>(1 &lt;&lt; 24)</code> at the start? Why is it needed?</p>
-
-<p>The decimal number <code>1</code> shifted 24 bits to the left provides us with the necessary padding for our RGB values in binary. When you convert a decimal number to a binary number, you aren’t guaranteed 8 bits back - you will get the amount of bits it takes to represent that number (the reason we got 8 bits back for our 255 values is because it takes 8 bits to represent 255 in binary) - if you convert decimal <code>0</code> to binary you will only get one bit back - <code>0</code>, or if you convert 13 to binary you will get four bits back - <code>1101</code>.</p>
-
+<p><code class="language-text">111111111111111111111111</code></p>
+<p>Which is equal to “ffffff” when converted to a hexadecimal! Most of you will know that this colour is in fact white, or <code class="language-text">rgb(255, 255, 255)</code>.</p>
+<h3>Padding</h3>
+<p>Wait a minute - what’s that <code class="language-text">(1 &lt;&lt; 24)</code> at the start? Why is it needed?</p>
+<p>The decimal number <code class="language-text">1</code> shifted 24 bits to the left provides us with the necessary padding for our RGB values in binary. When you convert a decimal number to a binary number, you aren’t guaranteed 8 bits back - you will get the amount of bits it takes to represent that number (the reason we got 8 bits back for our 255 values is because it takes 8 bits to represent 255 in binary) - if you convert decimal <code class="language-text">0</code> to binary you will only get one bit back - <code class="language-text">0</code>, or if you convert 13 to binary you will get four bits back - <code class="language-text">1101</code>.</p>
 <p>When we shift 1 to the left 24 bits, we get this -</p>
-
-<div class="scroll">
-
-  <table>
-    <thead>
-      <tr>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td>0</td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
-</div>
-
+<p><code class="language-text">1000000000000000000000000</code></p>
 <p>The number 1 followed by 24 bits - 8 bits for each of our colour values.</p>
-
 <p>This means that whenever we add the results from converting our RGB values to binary, regardless of how many bits the result is, it’ll always add into the correct section of bits because we are shifting the values to the left by either 16, 8 or 0 bits.</p>
+<h2>Binary to Hexadecimal</h2>
+<p>We can convert our binary number into a hexadecimal string by using <code class="language-text">toString</code> and passing it <code class="language-text">16</code> as a value. Alternatively, you can use <code class="language-text">2</code> for binary or <code class="language-text">8</code> for octal.</p>
+<div class="gatsby-highlight" data-language="js"><pre class="language-js"><code class="language-js"><span class="token keyword">function</span> <span class="token function">rgbToHex</span><span class="token punctuation">(</span><span class="token parameter">r<span class="token punctuation">,</span> g<span class="token punctuation">,</span> b</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment">// r = 255, g = 255, b = 255</span>
+    <span class="token keyword">return</span> <span class="token string">"#"</span> <span class="token operator">+</span>
+    <span class="token punctuation">(</span>
+        <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">24</span><span class="token punctuation">)</span>
+            <span class="token comment">// Value: 16777216 or 1000000000000000000000000</span>
+        <span class="token operator">+</span> <span class="token punctuation">(</span>r <span class="token operator">&lt;&lt;</span> <span class="token number">16</span><span class="token punctuation">)</span>
+            <span class="token comment">// Value: 16711680 or 111111110000000000000000</span>
+            <span class="token comment">// Total: 33488896 or 1111111110000000000000000</span>
+        <span class="token operator">+</span> <span class="token punctuation">(</span>g <span class="token operator">&lt;&lt;</span> <span class="token number">8</span><span class="token punctuation">)</span>
+            <span class="token comment">// Value: 65280 or 1111111100000000</span>
+            <span class="token comment">// Total: 33554176 or 1111111111111111100000000</span>
+        <span class="token operator">+</span> b
+            <span class="token comment">// Value: 255 or 11111111</span>
+            <span class="token comment">// Total: 33554431 or 1111111111111111111111111</span>
+    <span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token number">16</span><span class="token punctuation">)</span> <span class="token comment">// "1ffffff"</span>
+    <span class="token punctuation">.</span><span class="token function">slice</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// "ffffff"</span>
+<span class="token punctuation">}</span>
 
-<h2 id="binary-to-hexadecimal">Binary to Hexadecimal</h2>
-
-<p>We can convert our binary number into a hexadecimal string by using <code>toString</code> and passing it <code>16</code> as a value. Alternatively, you can use <code>2</code> for binary or <code>8</code> for octal.</p>
-
-<div class="code-block">
-
-<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><code class="language-js" data-lang="js"> 1
- 2
- 3
- 4
- 5
- 6
- 7
- 8
- 9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21</code></pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">function</span> <span class="nx">rgbToHex</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// r = 255, g = 255, b = 255</span>
-    <span class="k">return</span> <span class="s2">&quot;#&quot;</span> <span class="o">+</span>
-    <span class="p">(</span>
-        <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">24</span><span class="p">)</span>
-            <span class="c1">// Value: 16777216 or 1000000000000000000000000</span>
-        <span class="o">+</span> <span class="p">(</span><span class="nx">r</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span><span class="p">)</span>
-            <span class="c1">// Value: 16711680 or 111111110000000000000000</span>
-            <span class="c1">// Total: 33488896 or 1111111110000000000000000</span>
-        <span class="o">+</span> <span class="p">(</span><span class="nx">g</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span>
-            <span class="c1">// Value: 65280 or 1111111100000000</span>
-            <span class="c1">// Total: 33554176 or 1111111111111111100000000</span>
-        <span class="o">+</span> <span class="nx">b</span>
-            <span class="c1">// Value: 255 or 11111111</span>
-            <span class="c1">// Total: 33554431 or 1111111111111111111111111</span>
-    <span class="p">)</span>
-    <span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span> <span class="c1">// &quot;1ffffff&quot;</span>
-    <span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// &quot;ffffff&quot;</span>
-<span class="p">}</span>
-
-<span class="nx">rgbToHex</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">);</span> <span class="c1">// #ffffff</span>
-</pre></div>
-</td></tr></table>
-
-</div>
-
-<h2 id="conclusion">Conclusion</h2>
-
+<span class="token function">rgbToHex</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">,</span> <span class="token number">255</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// #ffffff</span></code></pre></div>
+<h2>Conclusion</h2>
 <p>As you can see, the code used above is very clever but also very daunting to look at if you don’t understand what’s happening underneath the hood. Hopefully this post makes it all a lot clearer!</p>
-
 <p>If you have any queries, feel free to contact me on Twitter via <a href="https://twitter.com/rynclark" target="_blank">@rynclark</a></p>
-
-<p>Credit to the appropriate authors in this <a href="http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb" target="_blank">stackoverflow post.</a></p>
-
-	</div>
+<p>Credit to the appropriate authors in this <a href="http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb" target="_blank">stackoverflow post.</a></p></div><hr style="margin-bottom:1.625rem"/><div style="display:flex;align-items:center;margin-bottom:4.0625rem"><div class=" gatsby-image-wrapper" style="position:relative;overflow:hidden;display:inline-block;width:50px;height:50px;margin-right:0.8125rem;margin-bottom:0;min-width:50px;border-radius:100%"><img src="data:image/jpeg;base64,/9j/2wBDABALDA4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVGC8aGi9jQjhCY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2NjY2P/wgARCAAUABQDASIAAhEBAxEB/8QAGAABAAMBAAAAAAAAAAAAAAAAAAMEBQL/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/aAAwDAQACEAMQAAABuwWITXBl8FmuJf/EABsQAAICAwEAAAAAAAAAAAAAAAECAwQAETIQ/9oACAEBAAEFArp0sUTeXRtISqpl/gc5/8QAFhEBAQEAAAAAAAAAAAAAAAAAARAx/9oACAEDAQE/ASGz/8QAFhEAAwAAAAAAAAAAAAAAAAAAARAx/9oACAECAQE/ATEYv//EABoQAAIDAQEAAAAAAAAAAAAAAAACARARYXH/2gAIAQEABj8CU1spdk7S+kV//8QAGxABAAICAwAAAAAAAAAAAAAAAQAREDEhUWH/2gAIAQEAAT8hBT2xgVPDAcALg1As1jZkGkx//9oADAMBAAIAAwAAABDTwDz/xAAXEQADAQAAAAAAAAAAAAAAAAABEBEx/9oACAEDAQE/EJpq0X//xAAWEQEBAQAAAAAAAAAAAAAAAAAQMRH/2gAIAQIBAT8Q1BA//8QAHRAAAgIDAAMAAAAAAAAAAAAAAREhMQAQYUFRkf/aAAgBAQABPxDgJD3GKGGCCONModqyVCCnFgwuXPnk6gFYYfMbgJp9nX//2Q==" alt="Ryan Clark" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:1;transition:opacity 0.5s;transition-delay:0.25s;border-radius:50%"/><noscript><picture><img width="50" height="50" srcset="/static/89447586dcc046565cd42084cb1753e2/7e494/profile-pic.jpg 1x,
+/static/89447586dcc046565cd42084cb1753e2/36cc2/profile-pic.jpg 1.5x,
+/static/89447586dcc046565cd42084cb1753e2/0a3a6/profile-pic.jpg 2x,
+/static/89447586dcc046565cd42084cb1753e2/75d16/profile-pic.jpg 3x" src="/static/89447586dcc046565cd42084cb1753e2/7e494/profile-pic.jpg" alt="Ryan Clark" style="position:absolute;top:0;left:0;transition:opacity 0.5s;transition-delay:0.5s;opacity:1;width:100%;height:100%;object-fit:cover;object-position:center"/></picture></noscript></div><div>A blog by me, <strong>Ryan Clark</strong>. <a target="_blank" href="https://twitter.com/rynclark">Follow me on Twitter!</a></div></div><div id="disqus_thread"></div></main></div></div></div><script>
   
-	<div class="disqus">
-		<div id="disqus_thread"></div>
-	</div>
-</article>
-
-<script>
-  var disqus_url = "http://ryanclark.me//rgb-to-hex-via-binary-shifting";
-  var disqus_title = "RGB to Hex via Binary Shifting";
-  var disqus_shortname = 'rynclark';
-  (function() {
-    var dsq = document.createElement('script');
-    dsq.async = dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-    document.getElementsByTagName('head')[0].appendChild(dsq);
-  })();
-</script>
-
-<script>
-  var c = document.querySelector('canvas');
-  var ctx = c.getContext("2d");
-
-  var started = window.innerWidth >= 800;
-
-  window.addEventListener('resize', function () {
-    var newStarted = window.innerWidth >= 800;
-    if (!started && newStarted) {
-      started = newStarted;
-      loop();
-    }
-    started = newStarted;
-  });
-
-  // SVG is resolution independent. Canvas is not. We need to make our canvas
-  // High Resolution.
-
-  // lets get the resolution of our device.
-  var pixelRatio = window.devicePixelRatio || 1;
-
-  // lets scale the canvas and change its CSS width/height to make it high res.
-  c.style.width = c.width +'px';
-  c.style.height = c.height +'px';
-  c.width *= pixelRatio;
-  c.height *= pixelRatio;
-
-  // Now that its high res we need to compensate so our images can be drawn as
-  //normal, by scaling everything up by the pixelRatio.
-  ctx.setTransform(pixelRatio,0,0,pixelRatio,0,0);
-  ctx.translate(-4, 0);
-
-  var cw = c.width;
-  var ch = c.height;
-
-  function createClip(ctx) {
-    ctx.save();
-    ctx.miterLimit=4;
-    ctx.scale(1.0973936899862824,1.0973936899862824);
-    ctx.translate(0.17219917012447183,0);
-    ctx.scale(1.0926694329183957,1.0926694329183957);
-    ctx.restore();
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(33.2,31.5);
-    ctx.bezierCurveTo(33.2,36.3,31.400000000000002,39.5,27.900000000000002,41);
-    ctx.lineTo(32.900000000000006,59.9);
-    ctx.bezierCurveTo(33.10000000000001,60.8,32.7,61.199999999999996,31.900000000000006,61.199999999999996);
-    ctx.lineTo(24.400000000000006,61.199999999999996);
-    ctx.bezierCurveTo(23.700000000000006,61.199999999999996,23.300000000000004,60.8,23.200000000000006,60.199999999999996);
-    ctx.lineTo(18.400000000000006,41.89999999999999);
-    ctx.lineTo(13.400000000000006,41.89999999999999);
-    ctx.lineTo(13.400000000000006,60);
-    ctx.bezierCurveTo(13.400000000000006,60.7,13.000000000000005,61.2,12.200000000000006,61.2);
-    ctx.lineTo(4.8,61.2);
-    ctx.bezierCurveTo(4.1,61.2,3.5999999999999996,60.800000000000004,3.5999999999999996,60);
-    ctx.lineTo(3.5999999999999996,4.7);
-    ctx.bezierCurveTo(3.6,4,4,3.6,4.8,3.6);
-    ctx.lineTo(22.900000000000002,3.6);
-    ctx.bezierCurveTo(29.700000000000003,3.6,33.300000000000004,7.2,33.300000000000004,14);
-    ctx.lineTo(33.300000000000004,31.5);
-    ctx.closePath();
-    ctx.moveTo(20.5,32.4);
-    ctx.bezierCurveTo(22.4,32.4,23.4,31.4,23.4,29.5);
-    ctx.lineTo(23.4,16);
-    ctx.bezierCurveTo(23.4,14.1,22.4,13.1,20.5,13.1);
-    ctx.lineTo(13.4,13.1);
-    ctx.lineTo(13.4,32.4);
-    ctx.lineTo(20.5,32.4);
-    ctx.moveTo(69.3,21.7);
-    ctx.bezierCurveTo(69.3,22.4,68.89999999999999,22.9,68.1,22.9);
-    ctx.lineTo(60.89999999999999,22.9);
-    ctx.bezierCurveTo(60.099999999999994,22.9,59.69999999999999,22.5,59.69999999999999,21.7);
-    ctx.lineTo(59.69999999999999,16);
-    ctx.bezierCurveTo(59.69999999999999,14.1,58.69999999999999,13.1,56.79999999999999,13.1);
-    ctx.lineTo(53.09999999999999,13.1);
-    ctx.bezierCurveTo(51.19999999999999,13.1,50.19999999999999,14.1,50.19999999999999,16);
-    ctx.lineTo(50.19999999999999,48.8);
-    ctx.bezierCurveTo(50.19999999999999,50.699999999999996,51.19999999999999,51.699999999999996,53.09999999999999,51.699999999999996);
-    ctx.lineTo(56.79999999999999,51.699999999999996);
-    ctx.bezierCurveTo(58.69999999999999,51.699999999999996,59.69999999999999,50.8,59.69999999999999,48.8);
-    ctx.lineTo(59.69999999999999,43);
-    ctx.bezierCurveTo(59.69999999999999,42.3,60.09999999999999,41.8,60.89999999999999,41.8);
-    ctx.lineTo(68.1,41.8);
-    ctx.bezierCurveTo(68.8,41.8,69.3,42.199999999999996,69.3,43);
-    ctx.lineTo(69.3,50.8);
-    ctx.bezierCurveTo(69.3,57.599999999999994,65.6,61.199999999999996,58.9,61.199999999999996);
-    ctx.lineTo(50.8,61.199999999999996);
-    ctx.bezierCurveTo(44,61.199999999999996,40.4,57.599999999999994,40.4,50.8);
-    ctx.lineTo(40.4,14);
-    ctx.bezierCurveTo(40.4,7.2,44.1,3.5999999999999996,50.8,3.5999999999999996);
-    ctx.lineTo(58.9,3.5999999999999996);
-    ctx.bezierCurveTo(65.6,3.5999999999999996,69.3,7.199999999999999,69.3,14);
-    ctx.lineTo(69.3,21.7);
-    ctx.closePath();
-    ctx.clip();
-  }
-
-  var points = [];
-  var tick = 0;
-  var opt = {
-    count: 5,
-    range: {
-      x: 0,
-      y: 7
-    },
-    duration: {
-      min: 20,
-      max: 100
-    },
-    thickness: 0,
-    strokeColor: '#444',
-    level: 1,
-    curved: true
-  };
-
-  var post = document.querySelector('.contents');
-  var bar = document.querySelector('.header__progress__bar');
-
-  var documentSize = document.body.scrollHeight;
-  var postHeight = post.getBoundingClientRect().top + post.getBoundingClientRect().height;
-
-  var bodyRect = document.body.getBoundingClientRect(),
-    elemRect = post.getBoundingClientRect(),
-    offsets   = elemRect.top - bodyRect.top;
-
-  var offset = c.height + 5;
-
-  ctx.lineWidth = 0;
-  var timeout;
-  function changeWidth() {
-    var scrollPercentage = 1 - ((window.scrollY) / (elemRect.height + offsets - window.innerHeight));
-    offset = (72 * scrollPercentage) + 5;
-    ctx.lineWidth = 16 * Math.max(0, (1 - scrollPercentage) - 0.3);
-
-    opt.range.y = 10;
-    clearTimeout(timeout);
-    timeout = setTimeout(function () {
-      opt.range.y = 2;
-    }, 1000);
-  }
-
-  window.addEventListener('scroll', changeWidth);
-  window.addEventListener('resize', changeWidth);
-
-  function rand(min, max){
-    return Math.floor( (Math.random() * (max - min + 1) ) + min);
-  }
-
-  function ease(t, b, c, d) {
-    if ((t/=d/2) < 1) return c/2*t*t + b;
-    return -c/2 * ((--t)*(t-2) - 1) + b;
-  }
-
-  ctx.lineJoin = 'round';
-
-  var Point = function(config){
-    this.anchorX = config.x;
-    this.anchorY = config.y;
-    this.x = config.x;
-    this.y = config.y;
-    this.setTarget();
-  };
-
-  Point.prototype.setTarget = function(){
-    this.initialX = this.x;
-    this.initialY = this.y;
-    this.targetX = this.anchorX + rand(0, opt.range.x * 2) - opt.range.x;
-    this.targetY = this.anchorY + rand(0, opt.range.y * 2) - opt.range.y;
-    this.tick = 0;
-    this.duration = rand(opt.duration.min, opt.duration.max);
-  }
-
-  Point.prototype.update = function(){
-    var dx = this.targetX - this.x;
-    var dy = this.targetY - this.y;
-    var dist = Math.sqrt(dx * dx + dy * dy);
-
-    if(Math.abs(dist) <= 0){
-      this.setTarget();
-    } else {
-      var t = this.tick;
-      var b = this.initialY;
-      var c = this.targetY - this.initialY;
-      var d = this.duration;
-      this.y = ease(t, b, c, d);
-
-      b = this.initialX;
-      c = this.targetX - this.initialX;
-      d = this.duration;
-      this.x = ease(t, b, c, d);
-
-      this.tick++;
-    }
-  };
-
-  Point.prototype.render = function(){
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, false);
-    ctx.fillStyle = '#000';
-    ctx.fill();
-  };
-
-  var updatePoints = function(){
-    var i = points.length;
-    while(i--){
-      points[i].update();
-    }
-  };
-
-  var renderPoints = function(){
-    var i = points.length;
-    while(i--){
-      points[i].render();
-    }
-  };
-
-  var lotsOfPoints = [];
-
-  function quadraticBezierCurvePoint(t, c) {
-    // compute relative coordinates of a point on the curve using t and c
-    // t is a number between 0 and 1
-    // c is an array of 3 points:
-    //     the initial point of the curve (always (0,0))
-    //     the "handle" point of the curve
-    //     the final point of the curve
-    var t1, t1_2a, t1_2b, t1_2c;
-    t1 = 1 - t;
-    t1_2a = t1 * t1;
-    t1_2b = (2 * t) * t1;
-    t1_2c = t * t;
-    return {
-      x: (c[0].x * t1_2a) + (t1_2b * c[1].x) + (t1_2c * c[2].x),
-      y: (c[0].y * t1_2a) + (t1_2b * c[1].y) + (t1_2c * c[2].y)
-    };
-  }
-  function b2p0(t, p) {
-    var k = 1 - t;
-    return k * k * p;
-  }
-
-  function b2p1(t, p) {
-    return 2 * (1 - t) * t * p;
-  }
-
-  function b2p2(t, p) {
-    return t * t * p;
-  }
-
-  function b2(t, p0, p1, p2) {
-    return b2p0( t, p0 ) + b2p1( t, p1 ) + b2p2( t, p2 );
-  }
-
-  function tangentQuadraticBezier(p0, p1, p2, t) {
-    return 2 * ( 1 - t ) * ( p1 - p0 ) + 2 * t * ( p2 - p1 );
-  }
-var log = false;
-  var renderShape = function(){
-    lotsOfPoints = [];
-    ctx.beginPath();
-    var pointCount = points.length;
-    ctx.moveTo(points[0].x, points[0].y + offset);
-    var i;
-    for (i = 0; i < pointCount - 1; i++) {
-      var c = (points[i].x + points[i + 1].x) / 2;
-      var d = (points[i].y + points[i + 1].y) / 2;
-      ctx.quadraticCurveTo(points[i].x, points[i].y + offset, c, d + offset);
-    }
-    ctx.lineTo(-opt.range.x - opt.thickness, ch + opt.thickness + offset);
-    ctx.lineTo(cw + opt.range.x + opt.thickness, ch + opt.thickness + offset);
-    ctx.closePath();
-    ctx.fillStyle = pattern2;
-    ctx.fill();
-    ctx.strokeStyle = pattern;
-    ctx.stroke();
-
-    ctx.save();
-
-    for (var i = 0; i < bubbles.length; i++) {
-      bubbles[i].ycoord -= bubbles[i].move;
-      if (bubbles[i].ycoord < (offset + 16)) {
-        bubbles[i].xcoord = getRandomNum(0, cw);
-        bubbles[i].ycoord = ch + maxRadius;
-        bubbles[i].radius = getRandomNum(minRadius, maxRadius);
-        bubbles[i].move = getRandomNum(minMove, maxMove);
-      }
-
-      ctx.beginPath();
-      ctx.arc(bubbles[i].xcoord, bubbles[i].ycoord, bubbles[i].radius, 0, Math.PI*2, false);
-      ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
-      ctx.fill();
-      ctx.closePath();
-    }
-  };
-
-
-  /**
-   *  Get Random Integer
-   */
-  function getRandomInt (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  }
-
-  /**
-   *  Get Random Number
-   */
-  function getRandomNum(min, max) {
-    return (Math.random() * (max - min + 1)) + min;
-  }
-
-  var bubbles = new Array();
-  var bubblesNum = 75;
-
-  var minRadius = 1;
-  var maxRadius = 3;
-  var minMove = 0.1;
-  var maxMove = 0.2;
-
-  for (var i = 0; i < bubblesNum; i++) {
-    bubbles[i] = {
-      xcoord: getRandomNum(0, cw),
-      ycoord: getRandomNum(0, ch),
-      radius: getRandomNum(minRadius, maxRadius),
-      move: getRandomNum(minMove, maxMove)
-    }
-  }
-
-  var clear = function(){
-    ctx.clearRect(0, 0, cw, ch);
-  };
-
-  var i = opt.count + 2;
-  var spacing = (cw + (opt.range.x * 2)) / (opt.count-1);
-  while(i--){
-    points.push(new Point({
-      x: (spacing * (i - 1)) - opt.range.x,
-      y: ch - (ch * opt.level)
-    }));
-  }
-
-
-  window.requestAnimFrame=function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(a){window.setTimeout(a,1E3/60)}}();
-
-  var loop = function(){
-    if (started) {
-      window.requestAnimFrame(loop, c);
-    }
-    tick++;
-    clear();
-    createClip(ctx);
-    ctx.fillStyle = "#262626";
-    ctx.fillRect(0, 0, cw, ch);
-
-    updatePoints();
-    renderShape();
-  };
-  var tempCanvas = document.createElement("canvas"),
-    tCtx = tempCanvas.getContext("2d");
-
-  var tempCanvas2 = document.createElement("canvas"),
-    tCtx2 = tempCanvas2.getContext("2d");
-
-  var pattern, pattern2;
-
-  var img1 = new Image();
-  //drawing of the test image - img1
-  img1.onload = function () {
-    tempCanvas.width = cw;
-    tempCanvas.height = 16;
-    tCtx.drawImage(img1, 0, 0, cw, 16, 0, 0, cw, 16);
-    pattern = ctx.createPattern(tempCanvas, 'repeat');
-
-    tempCanvas2.width = cw;
-    tempCanvas2.height = ch;
-    tCtx2.drawImage(img1, 0, 0, img1.width, img1.height, 0, -100, cw, ch + 100);
-    pattern2 = ctx.createPattern(tempCanvas2, 'repeat');
-    loop();
-  };
-
-  img1.src = '/img/beer.jpg';
-</script>
-
-
-    <div class="main-background">
-      <div class="main-background__left">
-        <div class="main-background__overlay"></div>
-      </div>
-      <div class="main-background__right">
-        <div class="main-background__overlay"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  
+  if(true) {
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
     m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-49723822-1', 'auto');
-  ga('send', 'pageview');
-</script>
-
-<script type="text/javascript" src="/js/main.335918d038e996e66abe.js"></script></body>
-</html>
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  }
+  if (typeof ga === "function") {
+    ga('create', 'UA-49723822-1', 'auto', {});
+      
+      
+      
+      }
+      </script><script id="gatsby-script-loader">/*<![CDATA[*/window.page={"componentChunkName":"component---src-templates-blog-post-tsx","jsonName":"rgb-to-hex-via-binary-shifting-257","path":"/rgb-to-hex-via-binary-shifting/"};window.dataPath="941/path---rgb-to-hex-via-binary-shifting-257-dda-5YJQv9kvAfPDrpXYGnIJVCFyU";/*]]>*/</script><script id="gatsby-chunk-mapping">/*<![CDATA[*/window.___chunkMapping={"app":["/app-6cffb0c4ad93a48e7404.js"],"component---node-modules-gatsby-plugin-offline-app-shell-js":["/component---node-modules-gatsby-plugin-offline-app-shell-js-4ce7f49cec02d9b9d831.js"],"component---src-templates-blog-post-tsx":["/component---src-templates-blog-post-tsx-183a370a05221aadf4d8.js"],"component---src-pages-404-tsx":["/component---src-pages-404-tsx-6c96f72c8639d0e87384.js"],"component---src-pages-index-tsx":["/component---src-pages-index-tsx-8436d0bb0b6d39def690.js"],"pages-manifest":["/pages-manifest-e4c69f0d811e115f68f4.js"]};/*]]>*/</script><script src="/webpack-runtime-15e612511969a13b1fa1.js" async=""></script><script src="/styles-99a47daf12289a4bd376.js" async=""></script><script src="/app-6cffb0c4ad93a48e7404.js" async=""></script><script src="/0-598e12153a4b2f19d440.js" async=""></script><script src="/9-0c2af406927ebc328aa0.js" async=""></script><script src="/component---src-templates-blog-post-tsx-183a370a05221aadf4d8.js" async=""></script></body></html>
