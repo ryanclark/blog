@@ -120,7 +120,7 @@ export function Layout(props: LayoutProps) {
         </LogoLink>
 
         <SocialIcons>
-          <SocialLink href="https://github.com/rynclark" target="_blank"><GitHubIcon /></SocialLink>
+          <SocialLink href="https://github.com/ryanclark" target="_blank"><GitHubIcon /></SocialLink>
           <SocialLink href="https://twitter.com/rynclark" target="_blank"><TwitterIcon /></SocialLink>
         </SocialIcons>
       </Header>

@@ -36,7 +36,7 @@ Once our organs have got all that they need from the blood, they can then do stu
 
 ## Let's chat
 
-Whilst I do apologise for that poor analogy, it does help to simplify what each part of Flux does. We're going to create a simple messaging app (much like one of the Flux examples on GitHub), with multiple components that rely on staying in sync with each other. You can <a href="https://github.com/rynclark/flux-getting-started" target="_blank">clone the start repo here</a>, which includes a gulp task for writing our application. Please note, you don't need to clone the repo - I will link to demos during the tutorial!
+Whilst I do apologise for that poor analogy, it does help to simplify what each part of Flux does. We're going to create a simple messaging app (much like one of the Flux examples on GitHub), with multiple components that rely on staying in sync with each other. You can <a href="https://github.com/ryanclark/flux-getting-started" target="_blank">clone the start repo here</a>, which includes a gulp task for writing our application. Please note, you don't need to clone the repo - I will link to demos during the tutorial!
 
 ### Install
 

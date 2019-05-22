@@ -26,7 +26,7 @@ Let's go full circle - we're going to be recreating FaceMash in React Native. If
 
 ## Creating our app
 
-<a href="https://github.com/rynclark/facemash" target="_blank">You can clone the start repo here</a> if you wish. This isn't necessary, however there different branches of the code at different stages just in case you get lost!
+<a href="https://github.com/ryanclark/facemash" target="_blank">You can clone the start repo here</a> if you wish. This isn't necessary, however there different branches of the code at different stages just in case you get lost!
 
 ### Houston, we have lift off
 
